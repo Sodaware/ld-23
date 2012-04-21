@@ -17,8 +17,8 @@
   <classpaths>
     <class path="src" />
     <class path="vendor\flixel" />
-    <class path="vendor\flixel-power-tools\Test Suite\src" />
     <class path="vendor\as3-mixin\src" />
+    <class path="vendor\flixel-power-tools\Test Suite\src" />
   </classpaths>
   <!-- Build options -->
   <build>
