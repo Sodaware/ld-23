@@ -8,7 +8,7 @@ package
 	[SWF(width="300", height="250", backgroundColor="#000000")]
  	
 	/**
-	 * Main game class for RedditGameJam #4 game
+	 * Main game class for Ludum Dare #23
 	 */
 	public class Ineptia extends FlxGame
 	{
