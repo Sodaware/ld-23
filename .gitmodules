@@ -1,3 +1,9 @@
 [submodule "vendor/flixel"]
 	path = vendor/flixel
 	url = https://github.com/AdamAtomic/flixel.git
+[submodule "vendor/flixel-power-tools"]
+	path = vendor/flixel-power-tools
+	url = https://github.com/photonstorm/Flixel-Power-Tools.git
+[submodule "vendor/as3-mixin"]
+	path = vendor/as3-mixin
+	url = https://github.com/specialunderwear/as3-mixin.git
