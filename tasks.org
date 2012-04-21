@@ -1,6 +1,6 @@
-* LD #23 - Tiny World
+#+TITLE: LD #23 - Tiny World
 
-** Ideas
+* Ideas
 
  - Games with tiny worlds
    - populous
@@ -15,9 +15,84 @@
    - Strategy / rts?
    - Top down exploration? Zelda? 
 
-** Task List
-*** DONE Come up with an idea :)
-*** Art
-*** Maps
-*** Coding
-*** Screens
+
+* Task List
+** DONE Come up with an idea :)
+** Art
+*** TODO Robot walkabout sprite
+*** DONE Queue icons [9/9]
+    - [X] Forward
+    - [X] Backward
+    - [X] Step left
+    - [X] Step right
+    - [X] Turn left
+    - [X] Turn right
+    - [X] Shoot
+    - [X] Scan
+    - [X] Use item
+*** Item icons [/]
+    - [ ] Repair kit
+    - [ ] 
+*** GUI
+    - [ ] Window frames
+    - [ ] Pointer
+    - [ ] buttons
+*** Tiles
+    - [ ] Crates
+    - [ ] Beacons
+    - [ ] General terrain
+** Maps
+*** TODO Worlds
+**** TODO World 1 - Temperate
+**** TODO World 2 - Tundra
+**** TODO World 3 - Jungle
+**** TODO World 4 - Desert
+**** TODO World 5 - City? (this one sucks)
+** Coding
+** Screens
+*** TODO Title screen [0/3]
+    - [ ] Press start to play
+    - [ ] version number
+    - [ ] Link to lab / main site
+*** TODO Intro screen [0/2]
+    - [ ] Window frame
+    - [ ] Text
+*** TODO World play state [/]
+    - [ ] Action queue
+*** TODO Equipment screen [0/2]
+    - [ ] List available items
+    - [ ] Allow items to be added / removed to slots
+*** TODO Upgrade screen [0/3]
+    - [ ] Display current moneys
+    - [ ] List available items
+    - [ ] List upgrades?
+*** TODO Load screen
+*** TODO Credits screen
+** Overlays
+*** TODO help screen
+*** TODO World status screen [0/4]
+    - [ ] Total moves to complete
+    - [ ] Animals catalogued
+    - [ ] Enemies destroyed
+    - [ ] beacons destroyed
+*** TODO radar screen
+*** TODO inventory screen
+*** TODO Text Box [0/1]
+    - [ ] Text Box
+** Objects
+** Inventory items
+** Polish (DO NOT DO THESE FIRST!)
+*** Cancelled Red alert effect for intro
+*** preloader
+
+* Item Ideas etc
+** Upgrades
+   - Armor (e.g. HP)
+   - Queue size
+   - Radar range
+   - Weapon range
+   - Weapon damage
+   - Scanner range
+   - Inventory size
+** Animals
+   - Bushman (of course)

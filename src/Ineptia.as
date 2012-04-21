@@ -3,9 +3,10 @@ package
 	// Import Flixel library & main game code
 	import org.flixel.*; 
 	import screens.TitleScreenState;
+	import screens.PlayState;
 
 	// Set options for Flash file
-	[SWF(width="300", height="250", backgroundColor="#000000")]
+	[SWF(width="320", height="304", backgroundColor="#000000")]
  	
 	/**
 	 * Main game class for Ludum Dare #23
@@ -14,7 +15,8 @@ package
 	{
 		public function Ineptia()
 		{
-			super(150, 125, TitleScreenState, 2);
+			// 270 for widescreen
+			super(160, 152, PlayState, 2);
 		}
 
 	}
