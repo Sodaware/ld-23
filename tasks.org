@@ -1,0 +1,23 @@
+* LD #23 - Tiny World
+
+** Ideas
+
+ - Games with tiny worlds
+   - populous
+   - civilization
+   - sim city
+   - terranigma
+   - pokemon
+
+ - Possible Genres
+   - Sim / God style game
+   - metroidvania / exploration based
+   - Strategy / rts?
+   - Top down exploration? Zelda? 
+
+** Task List
+*** DONE Come up with an idea :)
+*** Art
+*** Maps
+*** Coding
+*** Screens
