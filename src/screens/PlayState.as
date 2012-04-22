@@ -14,8 +14,8 @@ package screens
 	import org.flixel.FlxText;
 	import org.flixel.FlxTilemap;
 	import org.flixel.plugin.photonstorm.FlxButtonPlus;
-	import ui.MovementButton;
-	import ui.PlayerIndicator;
+
+	import ui.*;
 	import util.*;
 	
 	import db.*;
@@ -50,6 +50,74 @@ package screens
 		protected var _rangeGrid:RangeGrid;
 		
 		public var onQueueEmpty:Function;
+		
+		public var _infoWindow:MessageBox;
+		public var _textBox:MessageBox;
+		
+		private var _targetModeEnabled:Boolean = false;
+		
+		
+		override public function update():void 
+		{
+			super.update();
+			
+			if (this._targetModeEnabled) {
+				var enemyOver:GameObject = null;
+				for each (var enemy:GameObject in GameObjectDb.getObjectsWithComponent(EnemyComponent)) {
+					
+					if (enemy.isMouseOver()) {
+						enemyOver = enemy;
+						break;
+					}
+				}
+				
+				if (enemyOver) {
+					
+					if (!this._infoWindow) {
+						this._infoWindow = new MessageBox("enemy", 0, 118, 160, 34, false);
+						this.add(this._infoWindow);
+					}
+					
+					if (FlxG.mouse.pressed()) {
+						if (this._rangeGrid.isObjectInGrid(enemyOver)) {
+							// Select as target
+							var playerQueueComponent:MoveableObjectComponent = MoveableObjectComponent(this._player.getComponent(MoveableObjectComponent));
+							var button:FlxSprite = this._queueButtons[playerQueueComponent.getSize()];
+							button.play("button_use_weapon");
+							this._player.addAction(EntityActionFactory.create(ContentDb.ACTION_SHOOT, {target: enemyOver}));
+							this._indicator.refresh();
+							this.disableTargetMode();
+							this.disableInfoWindow();
+							
+						} else {
+							this.add(new AlertBox("Not in range", 36, 10, 92, 22));
+						}
+					}
+					
+				} else {
+					if (this._infoWindow) {
+						this.disableInfoWindow();
+					}
+					
+					if (FlxG.mouse.pressed()) {
+						this.disableTargetMode();
+					}
+				}
+			}
+		}
+		
+		public function disableTargetMode() : void
+		{
+			this._targetModeEnabled = false;
+			
+			this.backLayer.remove(this._rangeGrid);
+			this.uiLayer.remove(this._textBox);
+				
+			this._rangeGrid.destroy();
+			this._textBox.destroy();
+						
+		}
+
 		
 		private function _addActionToPlayer(movementType:int, movementName:String) : void
 		{
@@ -98,28 +166,27 @@ package screens
 			
 			var somethingInRange:Boolean = false;
 			
-			// TODO: Update this to use range of the equipped weapon
-			this._rangeGrid = new RangeGrid(this._indicator.getSpriteObject(), 2, 0xFF2222);
+			// TODO: Update this to use range of the equipped weapon (when/if different weapons get added)
+			this._rangeGrid = new RangeGrid(this._indicator.getSpriteObject(), 1, 0xFF2222);
 			this.backLayer.add(this._rangeGrid);
 			
 			for each (var enemy:GameObject in GameObjectDb.getObjectsWithComponent(EnemyComponent)) {
 				if (this._rangeGrid.isObjectInGrid(enemy)) {
-					trace("Enemy was in the grid!");
+					somethingInRange = true;
 				}
 			}
 			
-			return;
+			if (!somethingInRange) {
+				this.uiLayer.add(new AlertBox("Nothing in Range", 36, 10, 92, 22));
+				this.backLayer.remove(this._rangeGrid);
+				this._rangeGrid.destroy();
+				return;
+			}
 			
-			var playerQueueComponent:MoveableObjectComponent = MoveableObjectComponent(this._player.getComponent(MoveableObjectComponent));
-		
+			this._textBox = new MessageBox("Select Target", 48, 10, 80, 22);
+			this.uiLayer.add(this._textBox);
+			this._targetModeEnabled = true;
 			
-			
-			
-			
-			var button:FlxSprite = this._queueButtons[playerQueueComponent.getSize()];
-			button.play("button_use_weapon");
-			this._player.addAction(EntityActionFactory.create(ContentDb.ACTION_SHOOT, {weapon: "gun"}));
-			this._indicator.refresh();
 		}
 		
 		private function Handle_onGoClick() : void
@@ -190,6 +257,13 @@ package screens
 			
 			this.backLayer.add(this._player);
 			this.backLayer.add(this._indicator);
+		}
+		
+		private function disableInfoWindow():void 
+		{
+			this.remove(this._infoWindow);
+			this._infoWindow.destroy();
+			this._infoWindow = null;
 		}
 		
 		override public function create() : void

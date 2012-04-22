@@ -16,6 +16,9 @@ package db
 		[Embed(source = "../../content/sprites/player.png")] public static var gfx_Player:Class;
 		[Embed(source = "../../content/sprites/evil_robot.png")] public static var gfx_EvilRobot:Class;
 		
+		// Bullets / Explosions
+		[Embed(source = "../../content/sprites/bullet.png")] public static var gfx_Bullet:Class;
+		
 		// User Interface
 		[Embed(source = "../../content/ui/overlay.png")] public static var gfx_Overlay:Class;	
 		[Embed(source = "../../content/ui/movement-buttons.png")] public static var gfx_MovementButtons:Class;

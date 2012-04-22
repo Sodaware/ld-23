@@ -2,6 +2,7 @@ package objects
 {
 	import components.EnemyComponent;
 	import components.MoveableObjectComponent;
+	import components.ShootableComponent;
 	/**
 	 * ...
 	 * @author Phil Newton
@@ -10,6 +11,7 @@ package objects
 	{
 		protected var _movement:MoveableObjectComponent;
 		protected var _brain:EnemyComponent;
+		protected var _body:ShootableComponent;
 		
 		public function EvilRobotObject(xPos:int, yPos:int, gfx:Class)
 		{
@@ -20,8 +22,11 @@ package objects
 			
 			this._brain = new EnemyComponent();
 			
+			this._body = new ShootableComponent(10);
+			
 			this.addComponent(this._movement);
 			this.addComponent(this._brain);
+			this.addComponent(this._body);
 			
 			this.loadGraphic(gfx, true, false, 16, 16);
 			this.addAnimation("stand_down", [0, 1], 2);

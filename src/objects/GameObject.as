@@ -1,12 +1,14 @@
 package objects 
 {
 	import components.BaseComponent;
+	import db.GameObjectDb;
 	import db.ResourceDb;
 	import flash.display.InteractiveObject;
 	import org.flixel.FlxSound;
 	import org.flixel.FlxSprite;
 	import org.flixel.FlxG;
 	import org.flixel.FlxTilemap;
+	import org.flixel.FlxU;
 	
 	/**
 	 * ...
@@ -25,8 +27,22 @@ package objects
 		private var _components:Array;
 		private var _walkSound:FlxSound;
 		protected var _map:FlxTilemap;
+		protected var _mouseOver:Boolean;
+		
+		
 		
 		public var onQueueEmpty:Function;
+		
+		override public function kill():void 
+		{
+			super.kill();
+			GameObjectDb.remove(this);
+		}
+		
+		public function isMouseOver() : Boolean
+		{
+			return this._mouseOver;
+		}
 		
 		public function setMap(map:FlxTilemap) : void
 		{
@@ -124,6 +140,14 @@ package objects
 			super.update();
 			for each (var cmp:BaseComponent in this._components) {
 				cmp.update();
+			}
+			
+			// Check if mouse overlaps
+			this._mouseOver = false;
+			if (FlxG.mouse.getWorldPosition().x >= this.x && FlxG.mouse.getWorldPosition().x <= this.x + this.width) {
+				if (FlxG.mouse.getWorldPosition().y >= this.y && FlxG.mouse.getWorldPosition().y <= this.y + this.height) {
+					this._mouseOver = true;
+				}				
 			}
 		}
 		

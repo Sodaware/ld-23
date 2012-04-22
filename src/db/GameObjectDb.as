@@ -16,6 +16,11 @@ package db
 			GameObjectDb._objects.push(obj);
 		}
 		
+		public static function remove(obj:GameObject) : void
+		{
+			GameObjectDb._objects.splice(GameObjectDb._objects.indexOf(obj), 1);
+		}
+		
 		public static function getObjectsWithComponent(component:Class) : Array
 		{
 			var objectList:Array = new Array();

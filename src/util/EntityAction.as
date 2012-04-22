@@ -17,10 +17,17 @@ package util
 		protected var _eventType:int;
 		protected var _entity:GameObject;
 		protected var _isFinished:Boolean;
+		protected var _args:Object;
 		
 		public function EntityAction(eventType:int, args:Object = null) 
 		{
 			this._eventType = eventType;
+			this._args = args;
+		}
+		
+		public function getArg(key:String) : Object
+		{
+			return this._args[key];
 		}
 		
 		public function attach(obj:GameObject) : void
