@@ -19,13 +19,15 @@ package ui
 		
 		public function MessageBox(message:String, xPos:int, yPos:int, width:int, height:int, centerX:Boolean = true) 
 		{
-			
 			if (centerX) {
 				xPos = (FlxG.camera.width - width) / 2;
 			}
 			
 			this._message = new FlxText(xPos + 4, yPos + 4, width, message);
 			this._message.centerOffsets(false);
+			if (centerX) {
+				this._message.alignment = "center";
+			}
 			
 			var frameOuter:FlxSprite = new FlxSprite(xPos, yPos);
 			frameOuter.makeGraphic(width, height, 0xFF2E4B98);

@@ -16,6 +16,7 @@ package objects
 			super(xPos, yPos, gfx);
 			
 			this._body = new ShootableComponent(5);
+			this._body.setName("Crate");
 			
 			this.addComponent(this._body);
 		}

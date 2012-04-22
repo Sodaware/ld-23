@@ -2,9 +2,9 @@ package screens
 {
 	import events.DamageEvent;
 	import events.GameEventDispatcher;
+	import events.MoveCompleteEvent;
 	import flash.events.EventDispatcher;
 	import flash.media.ID3Info;
-	import mx.core.FlexSprite;
 	import org.flixel.FlxBasic;
 	import org.flixel.FlxButton;
 	import org.flixel.FlxCamera;
@@ -18,7 +18,6 @@ package screens
 	import org.flixel.FlxState;
 	import org.flixel.FlxText;
 	import org.flixel.FlxTilemap;
-	import org.flixel.plugin.photonstorm.FlxButtonPlus;
 	import particles.FlyoffParticle;
 
 	import ui.*;
@@ -37,32 +36,33 @@ package screens
 		// Layers
 		protected var backLayer:FlxGroup;
 		protected var uiLayer:FlxGroup;
-		protected var _indicator:PlayerIndicator;
+		
+		// UI Objects
+		public var _infoWindow:InfoWindow;
+		public var _textBox:MessageBox;
 		
 		protected var overlay:FlxSprite;
-		protected var _enemy:GameObject;
-		
-		// Objects
-		protected var _map:FlxTilemap;
-		protected var _player:PlayerRobot;
+		protected var _indicator:PlayerIndicator;
 		protected var _queueButtons:Array;
 		protected var _goButton:FlxButton;
+		protected var _rangeGrid:RangeGrid;
+		
+		protected var _enemy:GameObject;
+		
+		// Level
+		protected var _map:FlxTilemap;
+		
+		// Player
+		protected var _player:PlayerRobot;
 		
 		protected var _help:FlxText;
 		protected var _currentQueue:Array;
 		
 		protected var _queue:ActionQueue;
 		protected var _currentMove:FlxSprite;
-		protected var _rangeGrid:RangeGrid;
 		
-		public var onQueueEmpty:Function;
-		
-		public var _infoWindow:MessageBox;
-		public var _textBox:MessageBox;
-		
+		// State
 		private var _targetModeEnabled:Boolean = false;
-		
-		private var _flyoffs:FlxEmitter;
 		
 		override public function update():void 
 		{
@@ -80,8 +80,10 @@ package screens
 				
 				if (enemyOver) {
 					
+					
+					
 					if (!this._infoWindow) {
-						this._infoWindow = new MessageBox("enemy", 0, 118, 160, 34, false);
+						this._infoWindow = new InfoWindow(enemyOver, 0, 118, 160, 34);
 						this.add(this._infoWindow);
 					}
 					
@@ -150,30 +152,7 @@ package screens
 			
 		}
 		
-		private function Handle_movementClick() : void
-		{
-			this._addActionToPlayer(ContentDb.ACTION_MOVE_FORWARD, "button_forward");
-		}
-
-		private function Handle_buttonTurnRightClick() : void
-		{
-			this._addActionToPlayer(ContentDb.ACTION_TURN_RIGHT, "button_turn_right");
-		}
-
-		private function Handle_buttonTurnLeftClick() : void
-		{
-			this._addActionToPlayer(ContentDb.ACTION_TURN_LEFT, "button_turn_left");
-		}
-
-		private function Handle_buttonStepLeftClick() : void
-		{
-			this._addActionToPlayer(ContentDb.ACTION_MOVE_LEFT, "button_step_left");
-		}
 		
-		private function Handle_buttonStepRightClick() : void
-		{
-			this._addActionToPlayer(ContentDb.ACTION_MOVE_RIGHT, "button_step_right");
-		}
 		
 		private function Handle_buttonFireWeaponClick() : void
 		{
@@ -209,6 +188,8 @@ package screens
 			// Update all items that have MoveableObject component
 			var objectList:Array = GameObjectDb.getObjectsWithComponent(MoveableObjectComponent);
 			this._indicator.visible = false;
+			this._currentMove.visible = true;
+			this._currentMove.x = 1;
 			
 			for each (var object:GameObject in objectList) {
 				var cmp:MoveableObjectComponent = MoveableObjectComponent(object.getComponent(MoveableObjectComponent));
@@ -217,21 +198,75 @@ package screens
 			
 		}
 		
-		public function Handle_onPlayerQueueEmpty(player:GameObject) : void
-		{
-			this._indicator.visible = true;
-		}
+
 		
 		
 		// ----------------------------------------------------------------------
 		// -- Event Handlers
 		// ----------------------------------------------------------------------
 		
+		/**
+		 * Triggered when something is damaged. Generates a little flyoff.
+		 * @param	e
+		 */
 		public function Handle_onDamageEvent(e:DamageEvent) : void
 		{
 			var flyOff:FlyoffParticle = new FlyoffParticle(e.getDamage().toString(), e.getEntity().x, e.getEntity().y);
-			this.uiLayer.add(flyOff);
+			this.uiLayer.add(flyOff);	
+		}
+		
+		/**
+		 * Triggered when the player's movement queue is empty.
+		 * @param	player
+		 */
+		public function Handle_onPlayerQueueEmpty(player:GameObject) : void
+		{
+			for (var i:int = 0; i < this._queueButtons.length; i++) {
+				if (this._queueButtons[i] != null) {
+					FlxSprite(this._queueButtons[i]).play("button_empty");
+				}
+			}
+			this._indicator.visible = true;
+			this._currentMove.visible = false;
+		}
+		
+		public function Handle_onPlayerMoveCompleted(e:MoveCompleteEvent) : void
+		{
+			// Skip enemies
+			if (e.getEntity() != this._player) {
+				return;
+			}
 			
+			this._currentMove.x += 17;
+			
+		}
+		
+		/**
+		 * Called the "move forward" button is clicked
+		 */
+		private function Handle_buttonMoveForwardClick() : void
+		{
+			this._addActionToPlayer(ContentDb.ACTION_MOVE_FORWARD, "button_forward");
+		}
+
+		private function Handle_buttonTurnRightClick() : void
+		{
+			this._addActionToPlayer(ContentDb.ACTION_TURN_RIGHT, "button_turn_right");
+		}
+
+		private function Handle_buttonTurnLeftClick() : void
+		{
+			this._addActionToPlayer(ContentDb.ACTION_TURN_LEFT, "button_turn_left");
+		}
+
+		private function Handle_buttonStepLeftClick() : void
+		{
+			this._addActionToPlayer(ContentDb.ACTION_MOVE_LEFT, "button_step_left");
+		}
+		
+		private function Handle_buttonStepRightClick() : void
+		{
+			this._addActionToPlayer(ContentDb.ACTION_MOVE_RIGHT, "button_step_right");
 		}
 		
 		
@@ -301,6 +336,7 @@ package screens
 			this.setupCamera();
 			
 			GameEventDispatcher.getInstance().addEventListener(GameEventDispatcher.EVENT_DAMAGE, this.Handle_onDamageEvent);
+			GameEventDispatcher.getInstance().addEventListener(GameEventDispatcher.EVENT_MOVE_COMPLETED, this.Handle_onPlayerMoveCompleted);
 			
 			FlxG.mouse.load(ResourceDb.gfx_Cursor, 2);
 			
@@ -334,7 +370,7 @@ package screens
 			this._help = new FlxText(2, 104, 120, "");
 
 			// Add buttons
-			var forward:MovementButton		= new MovementButton(1, 136, ResourceDb.gfx_ButtonForward, this.Handle_movementClick, this._help, "Move Forward");
+			var forward:MovementButton		= new MovementButton(1, 136, ResourceDb.gfx_ButtonForward, this.Handle_buttonMoveForwardClick, this._help, "Move Forward");
 			var turnRight:MovementButton	= new MovementButton(18, 136, ResourceDb.gfx_ButtonTurnRight, this.Handle_buttonTurnRightClick, this._help, "Turn Right");
 			var turnLeft:MovementButton		= new MovementButton(35, 136, ResourceDb.gfx_ButtonTurnLeft, this.Handle_buttonTurnLeftClick, this._help, "Turn Left");
 
@@ -348,8 +384,9 @@ package screens
 			this._goButton.loadGraphic(ResourceDb.gfx_GoButton, true, false, 32, 13);
 			
 			this._currentMove = new FlxSprite(1, 121, ResourceDb.gfx_CurrentMoveIcon);
+			this._currentMove.scrollFactor.x = this._currentMove.scrollFactor.y = 0;
 			this._currentMove.visible = false;
-			
+			this._currentMove.alpha = 0.4;
 		
 			this.uiLayer.add(forward);
 			this.uiLayer.add(turnRight);

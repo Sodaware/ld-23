@@ -25,7 +25,7 @@ package util.actions
 		public override function update() : void
 		{
 			if (this._delay && this._delay.hasExpired) {
-				this._isFinished = true;
+				this.setFinished(true);
 			}
 		}
 		

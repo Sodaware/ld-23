@@ -23,6 +23,7 @@ package objects
 			this._brain = new EnemyComponent();
 			
 			this._body = new ShootableComponent(10);
+			this._body.setName("Evil Robot");
 			
 			this.addComponent(this._movement);
 			this.addComponent(this._brain);

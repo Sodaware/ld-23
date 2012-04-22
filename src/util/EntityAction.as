@@ -1,6 +1,9 @@
 package util 
 {
+	import components.MoveableObjectComponent;
 	import db.ContentDb;
+	import events.GameEventDispatcher;
+	import events.MoveCompleteEvent;
 	import objects.GameObject;
 	import org.flixel.FlxParticle;
 	import org.flixel.FlxPath;
@@ -40,7 +43,15 @@ package util
 			
 		}
 		
-		
+		protected function setFinished(finished:Boolean) : void
+		{
+			this._isFinished = finished;
+			
+			if (finished) {
+				var event:MoveCompleteEvent = new MoveCompleteEvent(this._entity, this);
+				GameEventDispatcher.getInstance().dispatchEvent(event);
+			}
+		}
 		public function isFinished() : Boolean
 		{
 			return this._isFinished;

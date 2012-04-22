@@ -80,7 +80,7 @@ package util.actions
 			}
 
 			if (this._delay && this._delay.hasExpired) {
-				this._isFinished = true;
+				this.setFinished(true);
 				this._entity.stand();
 			}
 	
