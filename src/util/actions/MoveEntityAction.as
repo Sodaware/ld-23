@@ -58,7 +58,7 @@ package util.actions
 		
 		public override function execute() : void
 		{
-			this._delay = new FlxDelay(1200);
+			this._delay = new FlxDelay(1500);
 			this._delay.start();
 		}
 		

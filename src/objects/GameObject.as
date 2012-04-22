@@ -26,6 +26,8 @@ package objects
 		private var _walkSound:FlxSound;
 		protected var _map:FlxTilemap;
 		
+		public var onQueueEmpty:Function;
+		
 		public function setMap(map:FlxTilemap) : void
 		{
 			this._map = map;

@@ -5,13 +5,13 @@ package util
 	import util.actions.*;
 	
 	/**
-	 * ...
-	 * @author Phil Newton
+	 * Creates movement actions that can be added to an entity's movement
+	 * queue.
 	 */
 	public class EntityActionFactory 
 	{
 		
-		public static function create(actionType:int) : EntityAction
+		public static function create(actionType:int, args:Object = null) : EntityAction
 		{
 			switch (actionType) {
 				
@@ -26,7 +26,19 @@ package util
 				case ContentDb.ACTION_TURN_RIGHT:
 					return new TurnEntityRightAction();
 					break;
+
+				case ContentDb.ACTION_MOVE_LEFT:
+					return new MoveEntityLeftAction();
+					break;
+
+				case ContentDb.ACTION_MOVE_RIGHT:
+					return new MoveEntityRightAction();
+					break;
 					
+				case ContentDb.ACTION_SHOOT:
+					return new FireWeaponAction(actionType, args);
+					break;
+				
 				default:
 					return null;
 					break;

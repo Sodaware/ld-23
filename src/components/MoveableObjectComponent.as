@@ -11,6 +11,7 @@ package components
 		protected var _queue:ActionQueue;
 		protected var _currentAction:EntityAction;
 		protected var _maxSize:int = -1;
+		public var onQueueEmpty:Function;
 		
 		public function MoveableObjectComponent() 
 		{
@@ -47,6 +48,11 @@ package components
 			return this._queue.getSize() == this._maxSize;
 		}
 		
+		public function isEmpty() : Boolean
+		{
+			return this._queue.getSize() == 0;
+		}
+		
 		public override function update() : void
 		{
 			if (this._currentAction != null) {
@@ -61,19 +67,20 @@ package components
 			
 		}
 		
-		public function executeQueue(onFinish:Function = null) : void
+		public function executeQueue() : void
 		{
 			if (this._queue.isEmpty()) {
 				this._currentAction = null;
+				if (this.onQueueEmpty) {
+					this.onQueueEmpty(this.getParent());
+				}
 				return;
 			}
-			
-			trace (this._queue.getSize().toString() + " item(s) left");
-			trace("Doing something");
 			
 			this._currentAction = this._queue.pop();
 			this._currentAction.attach(this.getParent());
 			this._currentAction.execute();
+			
 		}
 		
 		

@@ -18,6 +18,11 @@ package ui
 		private var _player:PlayerRobot;
 		private var _sprite:GameObject;
 		
+		public function getSpriteObject() : GameObject
+		{
+			return this._sprite;
+		}
+		
 		public function PlayerIndicator(player:PlayerRobot) 
 		{
 			super(0);

@@ -1,11 +1,10 @@
 package util.actions 
 {
-	import util.actions.MoveEntityAction;
+	
 	import objects.GameObject;
 	
 	/**
-	 * ...
-	 * @author Phil Newton
+	 * Rotates an entity 90 degrees to the left.
 	 */
 	public class TurnEntityLeftAction extends MoveEntityAction 
 	{

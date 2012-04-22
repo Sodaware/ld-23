@@ -18,7 +18,7 @@ package util
 		protected var _entity:GameObject;
 		protected var _isFinished:Boolean;
 		
-		public function EntityAction(eventType:int) 
+		public function EntityAction(eventType:int, args:Object = null) 
 		{
 			this._eventType = eventType;
 		}
