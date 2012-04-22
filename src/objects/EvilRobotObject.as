@@ -3,6 +3,10 @@ package objects
 	import components.EnemyComponent;
 	import components.MoveableObjectComponent;
 	import components.ShootableComponent;
+	import db.ContentDb;
+	import db.GameObjectDb;
+	import util.EntityAction;
+	import util.EntityActionFactory;
 	/**
 	 * ...
 	 * @author Phil Newton
@@ -41,6 +45,10 @@ package objects
 			this.addAnimation("walk_up", [6, 7], 4);
 			
 			this.play("stand_down");
+			
+			this._movement.addAction(EntityActionFactory.create(ContentDb.ACTION_TURN_LEFT));
+			this._movement.addAction(EntityActionFactory.create(ContentDb.ACTION_TURN_LEFT));
+			this._movement.addAction(EntityActionFactory.create(ContentDb.ACTION_SHOOT, {target: GameObjectDb.find("player")}));
 			
 		}
 		

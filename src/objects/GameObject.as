@@ -29,7 +29,7 @@ package objects
 		protected var _map:FlxTilemap;
 		protected var _mouseOver:Boolean;
 		
-		
+		private var _tag:String;
 		
 		public var onQueueEmpty:Function;
 		
@@ -172,6 +172,16 @@ package objects
 		{
 			this._components.push(cmp);
 			cmp.attach(this);
+		}
+		
+		public function get tag() : String
+		{
+			return _tag;
+		}
+		
+		public function set tag(value:String):void 
+		{
+			_tag = value;
 		}
 		
 	}

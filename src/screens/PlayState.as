@@ -72,7 +72,7 @@ package screens
 				var enemyOver:GameObject = null;
 				for each (var enemy:GameObject in GameObjectDb.getObjectsWithComponent(ShootableComponent)) {
 					
-					if (enemy.isMouseOver()) {
+					if (enemy.isMouseOver() && enemy != this._player) {
 						enemyOver = enemy;
 						break;
 					}
@@ -309,6 +309,7 @@ package screens
 		private function setupPlayer() : void
 		{
 			this._player = new PlayerRobot(32, 32);
+			this._player.tag = "player";
 			this._player.setMap(this._map);
 			
 			var cmp:MoveableObjectComponent = MoveableObjectComponent(this._player.getComponent(MoveableObjectComponent));

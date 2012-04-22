@@ -15,6 +15,7 @@ package objects
 	{
 		
 		private var _movement:MoveableObjectComponent;
+		private var _body:ShootableComponent;
 		
 		public function PlayerRobot(xPos:int, yPos:int)
 		{
@@ -23,7 +24,10 @@ package objects
 			this._movement = new MoveableObjectComponent();
 			this._movement.setMaxSize(4);
 			
+			this._body = new ShootableComponent(35);
+			
 			this.addComponent(this._movement);
+			this.addComponent(this._body);
 			
 			this.loadGraphic(ResourceDb.gfx_Player, true, false, 16, 16);
 			this.addAnimation("stand_down", [0, 1], 2);
