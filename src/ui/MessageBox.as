@@ -23,11 +23,8 @@ package ui
 				xPos = (FlxG.camera.width - width) / 2;
 			}
 			
-			this._message = new FlxText(xPos + 4, yPos + 4, width, message);
-			this._message.centerOffsets(false);
-			if (centerX) {
-				this._message.alignment = "center";
-			}
+			this._message = new FlxText(xPos + 4, yPos + 4, width - 8, message);
+			this._message.alignment = (centerX) ? "center" : "left";
 			
 			var frameOuter:FlxSprite = new FlxSprite(xPos, yPos);
 			frameOuter.makeGraphic(width, height, 0xFF2E4B98);

@@ -37,18 +37,31 @@ package components
 		{
 			
 			// Calculate damage
+			var damage:int = bullet.getStrength();
 			
-			// Make a little flyoff
+			// Create event for notify of damage
 			var event:DamageEvent = new DamageEvent(this.getParent(), bullet.getStrength());
-			GameEventDispatcher.getInstance().dispatchEvent(event);
 			
-			this._health -= bullet.getStrength();
+			// Update entity health
+			this._health -= damage;
+			
+			// If entity has no health, kill it
 			if (this._health <= 0) {
+				
 				this.getParent().kill();
+				event.setIsFatal(true);
+				
+				// Effects (can move this)
 				FlxG.play(ResourceDb.snd_Explosion1);
+				
 			} else {
+				
 				FlxG.play(ResourceDb.snd_Hit1);
+				
 			}
+			
+			// Fire the event
+			GameEventDispatcher.getInstance().dispatchEvent(event);
 		}
 		
 		public function get health():int 

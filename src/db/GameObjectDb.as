@@ -1,6 +1,7 @@
 package db 
 {
 	import objects.GameObject;
+	import org.flixel.FlxGroup;
 	
 	
 	/**
@@ -10,7 +11,12 @@ package db
 	public class GameObjectDb 
 	{
 		private static var _objects:Array = new Array();
+		private static var _entities:FlxGroup = new FlxGroup();
 		
+		public static function getGroup() : FlxGroup
+		{
+			return GameObjectDb._entities;
+		}
 		
 		public static function find(name:String) : GameObject
 		{
@@ -26,6 +32,7 @@ package db
 		public static function add(obj:GameObject) : void
 		{
 			GameObjectDb._objects.push(obj);
+			GameObjectDb._entities.add(obj);
 		}
 		
 		public static function remove(obj:GameObject) : void

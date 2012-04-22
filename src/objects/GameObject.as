@@ -35,7 +35,12 @@ package objects
 		
 		override public function kill():void 
 		{
+			// Kill updates
 			super.kill();
+			
+			// Stop sounds / movements
+			if (this._walkSound) this._walkSound.stop();
+			
 			GameObjectDb.remove(this);
 		}
 		
@@ -151,8 +156,14 @@ package objects
 			this._mouseOver = false;
 			if (FlxG.mouse.getWorldPosition().x >= this.x && FlxG.mouse.getWorldPosition().x <= this.x + this.width) {
 				if (FlxG.mouse.getWorldPosition().y >= this.y && FlxG.mouse.getWorldPosition().y <= this.y + this.height) {
+					
 					this._mouseOver = true;
-				}				
+					
+					if (FlxG.mouse.pressed()) {
+						// Fire a clicked event
+						
+					}
+				}
 			}
 		}
 		

@@ -18,6 +18,11 @@ package util
 			return this._actions;
 		}
 		
+		public function clear() : void
+		{
+			this._actions = [];
+		}
+		
 		public function ActionQueue() 
 		{
 			this._actions = new Array();

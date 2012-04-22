@@ -5,8 +5,13 @@ package objects
 	import components.ShootableComponent;
 	import db.ContentDb;
 	import db.GameObjectDb;
+	import events.GameEventDispatcher;
+	import events.TurnStartEvent;
+	import flash.events.Event;
 	import util.EntityAction;
 	import util.EntityActionFactory;
+	
+	
 	/**
 	 * ...
 	 * @author Phil Newton
@@ -46,9 +51,20 @@ package objects
 			
 			this.play("stand_down");
 			
-			this._movement.addAction(EntityActionFactory.create(ContentDb.ACTION_TURN_LEFT));
-			this._movement.addAction(EntityActionFactory.create(ContentDb.ACTION_TURN_LEFT));
-			this._movement.addAction(EntityActionFactory.create(ContentDb.ACTION_SHOOT, {target: GameObjectDb.find("player")}));
+			// Listen for the "go" button being pressed (so the enemy can calculate moves)
+			// Would like to delegate this down to the component level (in the brain section)
+			GameEventDispatcher.getInstance().addEventListener(GameEventDispatcher.EVENT_GO_PRESSED, this.Handle_beforeTurnStart);
+			
+		}
+		
+		private function Handle_beforeTurnStart(e:TurnStartEvent) : void
+		{
+			// Add stuff
+			for (var i:int = 0; i < e.playerQueueSize; i++) {
+				//this._movement.addAction(EntityActionFactory.create(ContentDb.ACTION_SHOOT, { target: GameObjectDb.find("player") } ));
+			}
+//			this._movement.addAction(EntityActionFactory.create(ContentDb.ACTION_TURN_LEFT));
+//			this._movement.addAction(EntityActionFactory.create(ContentDb.ACTION_TURN_LEFT));
 			
 		}
 		

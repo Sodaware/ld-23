@@ -1,23 +1,27 @@
 package events 
 {
-	import flash.events.Event;
+	import events.GameObjectEvent;
 	import objects.GameObject;
 	
 	/**
 	 * ...
 	 * @author Phil Newton
 	 */
-	public class DamageEvent extends Event 
+	public class DamageEvent extends GameObjectEvent 
 	{
 		
 		private var _damage:int;
-		private var _entity:GameObject;
+		private var _isFatal:Boolean = false
 		
-		public function DamageEvent(entity:GameObject, damage:int) 
+		public function DamageEvent(entity:GameObject, damage:int = 0) 
 		{
-			super(GameEventDispatcher.EVENT_DAMAGE);
-			this._entity = entity;
+			super(GameEventDispatcher.EVENT_DAMAGE, entity);
 			this._damage = damage;
+		}
+		
+		public function setIsFatal(fatal:Boolean) : void
+		{
+			this._isFatal = fatal;
 		}
 		
 		public function getDamage() : int
@@ -25,9 +29,9 @@ package events
 			return this._damage;
 		}
 		
-		public function getEntity(): GameObject 
+		public function isFatal() : Boolean
 		{
-			return _entity;
+			return this._isFatal;
 		}
 		
 		

@@ -38,6 +38,7 @@ package db
 		
 		// User Interface
 		[Embed(source = "../../content/ui/overlay.png")] public static var gfx_Overlay:Class;	
+		
 		[Embed(source = "../../content/ui/movement-buttons.png")] public static var gfx_MovementButtons:Class;
 		[Embed(source = "../../content/ui/button-go.png")] public static var gfx_GoButton:Class;
 		

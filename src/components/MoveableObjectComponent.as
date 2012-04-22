@@ -1,5 +1,6 @@
 package components 
 {
+	
 	import util.*;
 	
 	/**
@@ -21,6 +22,11 @@ package components
 		public function getActions() : ActionQueue
 		{
 			return this._queue;
+		}
+		
+		public function clear() : void
+		{
+			this._queue.clear();
 		}
 		
 		public override function afterAttach() : void

@@ -54,6 +54,10 @@ package util.actions
 			
 			// Check for entities
 			for each (var obj:GameObject in GameObjectDb.getObjectsWithComponent(ShootableComponent)) {
+				
+				// Ignore self
+				if (obj == this._entity) continue;
+				
 				if (obj.x == xPos && obj.y == yPos) {
 					return false;
 				}

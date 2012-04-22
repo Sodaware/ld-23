@@ -12,8 +12,10 @@ package events
 	{
 		private static var _instance:GameEventDispatcher = new GameEventDispatcher();
 		
-		public static const EVENT_DAMAGE:String = "damage";
+		public static const EVENT_DAMAGE:String			= "damage";
 		public static const EVENT_MOVE_COMPLETED:String = "move_completed";
+		public static const EVENT_GO_PRESSED:String		= "go_pressed";
+		public static const EVENT_ENTITY_CLICKED:String	= "entity_clicked";
 		
 		public function GameEventDispatcher() 
 		{

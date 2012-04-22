@@ -3,6 +3,8 @@ package screens
 	import events.DamageEvent;
 	import events.GameEventDispatcher;
 	import events.MoveCompleteEvent;
+	import events.TurnStartEvent;
+	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.media.ID3Info;
 	import org.flixel.FlxBasic;
@@ -36,6 +38,7 @@ package screens
 		// Layers
 		protected var backLayer:FlxGroup;
 		protected var uiLayer:FlxGroup;
+		protected var movementButtons:FlxGroup;
 		
 		// UI Objects
 		public var _infoWindow:InfoWindow;
@@ -64,10 +67,17 @@ package screens
 		// State
 		private var _targetModeEnabled:Boolean = false;
 		
+		
+		// ----------------------------------------------------------------------
+		// -- Main game logic
+		// ----------------------------------------------------------------------
+		
 		override public function update():void 
 		{
+			
 			super.update();
 			
+			// Handle targetting mode
 			if (this._targetModeEnabled) {
 				var enemyOver:GameObject = null;
 				for each (var enemy:GameObject in GameObjectDb.getObjectsWithComponent(ShootableComponent)) {
@@ -80,8 +90,6 @@ package screens
 				
 				if (enemyOver) {
 					
-					
-					
 					if (!this._infoWindow) {
 						this._infoWindow = new InfoWindow(enemyOver, 0, 118, 160, 34);
 						this.add(this._infoWindow);
@@ -93,7 +101,7 @@ package screens
 							var playerQueueComponent:MoveableObjectComponent = MoveableObjectComponent(this._player.getComponent(MoveableObjectComponent));
 							var button:FlxSprite = this._queueButtons[playerQueueComponent.getSize()];
 							button.play("button_use_weapon");
-							this._player.addAction(EntityActionFactory.create(ContentDb.ACTION_SHOOT, {target: enemyOver}));
+							playerQueueComponent.addAction(EntityActionFactory.create(ContentDb.ACTION_SHOOT, {target: enemyOver}));
 							this._indicator.refresh();
 							this.disableTargetMode();
 							this.disableInfoWindow();
@@ -113,6 +121,25 @@ package screens
 					}
 				}
 			}
+			
+		}
+		
+		public function enableMovementButtons() : void
+		{
+			for each (var button:MovementButton in this.movementButtons.members) {
+				button.alpha	= 1.0;
+				button.active 	= true;
+				button.color	= 0xFFFFFFFF;
+			}
+		}
+		
+		public function disableMovementButtons() : void
+		{
+			for each (var button:MovementButton in this.movementButtons.members) {
+				button.alpha	= 0.8;
+				button.active 	= false;
+				button.color	= 0xFF999999;
+			}
 		}
 		
 		public function disableTargetMode() : void
@@ -130,7 +157,7 @@ package screens
 		
 		private function _addActionToPlayer(movementType:int, movementName:String) : void
 		{
-			var playerQueueComponent:MoveableObjectComponent = MoveableObjectComponent(this._player.getComponent(MoveableObjectComponent));
+			var playerQueueComponent:MoveableObjectComponent = this._player.getComponent(MoveableObjectComponent) as MoveableObjectComponent;
 			
 			if (playerQueueComponent.isFull()) {
 				// play a sound?
@@ -139,6 +166,7 @@ package screens
 			
 			// Create the action
 			var action:EntityAction = EntityActionFactory.create(movementType);
+			action.attach(this._player);
 			if (!action.canPerform(this._indicator.getSpriteObject())) {
 				this.add(new AlertBox("Invalid Move", 36, 10, 76, 22));
 				return;
@@ -147,17 +175,139 @@ package screens
 			var button:FlxSprite = this._queueButtons[playerQueueComponent.getSize()];
 			button.play(movementName);
 			
-			this._player.addAction(action);
+			playerQueueComponent.addAction(action);
 			this._indicator.refresh();
 			
 		}
 		
 		
+		// ----------------------------------------------------------------------
+		// -- Event Handlers
+		// ----------------------------------------------------------------------
+		
+		/**
+		 * Triggered when something is damaged. Generates a little flyoff.
+		 * @param	e
+		 */
+		public function Handle_onDamageEvent(e:DamageEvent) : void
+		{
+			var flyOff:FlyoffParticle = new FlyoffParticle(e.getDamage().toString(), e.getEntity().x, e.getEntity().y);
+			this.uiLayer.add(flyOff);
+			
+			// Check if item was destroyed
+			if (e.isFatal()) {
+				
+				// Was it the player?
+				if (e.getEntity() == this._player) {
+					
+					// Clear all action queues
+					for each (var entity:GameObject in GameObjectDb.getObjectsWithComponent(MoveableObjectComponent)) {
+						var entityQueue:MoveableObjectComponent = entity.getComponent(MoveableObjectComponent) as MoveableObjectComponent;
+						entityQueue.clear()
+					}
+					
+					
+					
+				}
+				
+			}
+			
+		}
+		
+		/**
+		 * Triggered when the player's movement queue is empty.
+		 * @param	player
+		 */
+		public function Handle_onPlayerQueueEmpty(player:GameObject) : void
+		{
+			for (var i:int = 0; i < this._queueButtons.length; i++) {
+				if (this._queueButtons[i] != null) {
+					FlxSprite(this._queueButtons[i]).play("button_empty");
+				}
+			}
+			
+			// Re-enable the go button
+			this._goButton.active		= true;
+			this._goButton.alpha		= 1.0;
+			this._goButton.color		= 0xFFFFFFFF;
+			
+			// Re-enable movement
+			this.enableMovementButtons();
+			
+			// Toggle UI elements
+			this._indicator.visible		= true;
+			this._currentMove.visible	= false;
+		}
+		
+		/**
+		 * Triggered when a single player action has completed (such as a step forward).
+		 * @param	e
+		 */
+		public function Handle_onPlayerMoveCompleted(e:MoveCompleteEvent) : void
+		{
+			// Ignore event from enemies
+			if (e.getEntity() != this._player) {
+				return;
+			}
+			
+			// Adjust movement indicator
+			this._currentMove.x += 17;
+		}
+		
+		
+		// ----------------------------------------------------------------------
+		// -- Button click handlers
+		// ----------------------------------------------------------------------
+		
+		/**
+		 * Handles a click of the "GO" button
+		 */
+		private function Handle_onGoClick() : void
+		{
+			
+			// Let other objects know the player will be moving
+			GameEventDispatcher.getInstance().dispatchEvent(new TurnStartEvent(this._player));
+			
+			// Check there are items in the player queue
+			var playerMovement:MoveableObjectComponent = this._player.getComponent(MoveableObjectComponent) as MoveableObjectComponent;
+			if (playerMovement.getSize() == 0) {
+				return;
+			}
+			
+			// Disable GO button
+			this._goButton.active		= false;
+			this._goButton.alpha		= 0.8;
+			this._goButton.color		= 0xFF999999;
+			
+			// Disable all other buttons
+			this.disableMovementButtons();
+			
+			// Hide the movement indicator
+			this._indicator.visible		= false;
+			
+			// Show the current move indicator
+			this._currentMove.visible	= true;
+			this._currentMove.x			= 1;
+			
+			// Update all items that have MoveableObject component
+			var objectList:Array		= GameObjectDb.getObjectsWithComponent(MoveableObjectComponent);
+			for each (var object:GameObject in objectList) {
+				var cmp:MoveableObjectComponent = object.getComponent(MoveableObjectComponent) as MoveableObjectComponent;
+				cmp.executeQueue();
+			}
+			
+		}
 		
 		private function Handle_buttonFireWeaponClick() : void
 		{
-			// Check for enemies in range
+			// Check palyer can target anything
+			var playerQueueComponent:MoveableObjectComponent = this._player.getComponent(MoveableObjectComponent) as MoveableObjectComponent;
+			if (playerQueueComponent.isFull()) {
+				// play a sound?
+				return;
+			}
 			
+			// Check for enemies in range
 			var somethingInRange:Boolean = false;
 			
 			// TODO: Update this to use range of the equipped weapon (when/if different weapons get added)
@@ -180,64 +330,6 @@ package screens
 			this._textBox = new MessageBox("Select Target", 48, 10, 80, 22);
 			this.uiLayer.add(this._textBox);
 			this._targetModeEnabled = true;
-			
-		}
-		
-		private function Handle_onGoClick() : void
-		{
-			// Update all items that have MoveableObject component
-			var objectList:Array = GameObjectDb.getObjectsWithComponent(MoveableObjectComponent);
-			this._indicator.visible = false;
-			this._currentMove.visible = true;
-			this._currentMove.x = 1;
-			
-			for each (var object:GameObject in objectList) {
-				var cmp:MoveableObjectComponent = MoveableObjectComponent(object.getComponent(MoveableObjectComponent));
-				cmp.executeQueue();
-			}
-			
-		}
-		
-
-		
-		
-		// ----------------------------------------------------------------------
-		// -- Event Handlers
-		// ----------------------------------------------------------------------
-		
-		/**
-		 * Triggered when something is damaged. Generates a little flyoff.
-		 * @param	e
-		 */
-		public function Handle_onDamageEvent(e:DamageEvent) : void
-		{
-			var flyOff:FlyoffParticle = new FlyoffParticle(e.getDamage().toString(), e.getEntity().x, e.getEntity().y);
-			this.uiLayer.add(flyOff);	
-		}
-		
-		/**
-		 * Triggered when the player's movement queue is empty.
-		 * @param	player
-		 */
-		public function Handle_onPlayerQueueEmpty(player:GameObject) : void
-		{
-			for (var i:int = 0; i < this._queueButtons.length; i++) {
-				if (this._queueButtons[i] != null) {
-					FlxSprite(this._queueButtons[i]).play("button_empty");
-				}
-			}
-			this._indicator.visible = true;
-			this._currentMove.visible = false;
-		}
-		
-		public function Handle_onPlayerMoveCompleted(e:MoveCompleteEvent) : void
-		{
-			// Skip enemies
-			if (e.getEntity() != this._player) {
-				return;
-			}
-			
-			this._currentMove.x += 17;
 			
 		}
 		
@@ -318,8 +410,8 @@ package screens
 			GameObjectDb.add(this._player);
 			this._indicator = new PlayerIndicator(this._player);
 			
-			this.backLayer.add(this._player);
-			this.backLayer.add(this._indicator);
+			// this.backLayer.add(this._player);
+			
 		}
 		
 		private function disableInfoWindow():void 
@@ -342,11 +434,12 @@ package screens
 			FlxG.mouse.load(ResourceDb.gfx_Cursor, 2);
 			
 			this.uiLayer = new FlxGroup();
+			//this.uiLayer.add(this._indicator);
 			
 			// UI
 			this.overlay = new FlxSprite(0, 118, ResourceDb.gfx_Overlay);
 			this.uiLayer.add(this.overlay);
-						
+			
 			// Add Queue
 			for (var i:int = 0; i < SessionDb.QueueSize; i++) {
 				var button:FlxSprite = new FlxSprite(1 + (17 * i), 120);
@@ -371,21 +464,30 @@ package screens
 			this._help = new FlxText(2, 104, 120, "");
 
 			// Add buttons
-			var forward:MovementButton		= new MovementButton(1, 136, ResourceDb.gfx_ButtonForward, this.Handle_buttonMoveForwardClick, this._help, "Move Forward");
-			var turnRight:MovementButton	= new MovementButton(18, 136, ResourceDb.gfx_ButtonTurnRight, this.Handle_buttonTurnRightClick, this._help, "Turn Right");
-			var turnLeft:MovementButton		= new MovementButton(35, 136, ResourceDb.gfx_ButtonTurnLeft, this.Handle_buttonTurnLeftClick, this._help, "Turn Left");
+			this.movementButtons = new FlxGroup();
+			
+			var forward:MovementButton		= new MovementButton(18, 136, ResourceDb.gfx_ButtonForward, this.Handle_buttonMoveForwardClick, this._help, "Move Forward");
+			var turnRight:MovementButton	= new MovementButton(35, 136, ResourceDb.gfx_ButtonTurnRight, this.Handle_buttonTurnRightClick, this._help, "Turn Right");
+			var turnLeft:MovementButton		= new MovementButton(1, 136, ResourceDb.gfx_ButtonTurnLeft, this.Handle_buttonTurnLeftClick, this._help, "Turn Left");
 
 			var stepLeft:MovementButton		= new MovementButton(52, 136, ResourceDb.gfx_ButtonStepLeft, this.Handle_buttonStepLeftClick, this._help, "Step Left");
 			var stepRight:MovementButton	= new MovementButton(69, 136, ResourceDb.gfx_ButtonStepRight, this.Handle_buttonStepRightClick, this._help, "Step Right");
 			
 			var fireWeapon:MovementButton	= new MovementButton(86, 136, ResourceDb.gfx_ButtonFireWeapon, this.Handle_buttonFireWeaponClick, this._help, "Fire Weapon");
 			
+			this.movementButtons.add(forward);
+			this.movementButtons.add(turnRight);
+			this.movementButtons.add(turnLeft);
+			this.movementButtons.add(stepLeft);
+			this.movementButtons.add(stepRight);
+			this.movementButtons.add(fireWeapon);
 			
+			// GO button!
 			this._goButton = new FlxButton(127, 120, "", this.Handle_onGoClick);
 			this._goButton.loadGraphic(ResourceDb.gfx_GoButton, true, false, 32, 13);
 			
+			// Movement indicator
 			this._currentMove = new FlxSprite(1, 121, ResourceDb.gfx_CurrentMoveIcon);
-			this._currentMove.scrollFactor.x = this._currentMove.scrollFactor.y = 0;
 			this._currentMove.visible = false;
 			this._currentMove.alpha = 0.4;
 		
@@ -396,15 +498,22 @@ package screens
 			this.uiLayer.add(stepRight);
 			
 			this.uiLayer.add(fireWeapon);
+			this.uiLayer.add(this._currentMove);
 			
 			this.uiLayer.add(this._goButton);	
 			this.uiLayer.add(this._help);
 			
-			for each (var item:FlxSprite in this.uiLayer.members) {
-				item.scrollFactor.x = item.scrollFactor.y = 0;
+			this.uiLayer.add(this._indicator);
+			
+			for each (var item:MovementButton in this.movementButtons.members) {
+				ObjectUtil.lock(item);
 			}
 			
+			// Lock entities
+			ObjectUtil.lock(this._goButton, this._help, this._currentMove, this.overlay);
+			
 			this.add(this.backLayer);
+			this.add(GameObjectDb.getGroup());
 			this.add(this.uiLayer);
 			
 			this.uiLayer.add(this._currentMove);
@@ -413,9 +522,9 @@ package screens
 			this._enemy = new EvilRobotObject(32, 64, ResourceDb.gfx_EvilRobot);
 			this._enemy.setMap(this._map);
 			GameObjectDb.add(this._enemy);
-			this.backLayer.add(this._enemy);
+			
 
-			var crate:StationaryObject = new StationaryObject(16, 32, ResourceDb.gfx_Crate);
+			var crate:CrateObject = new CrateObject(16, 32, ResourceDb.gfx_Crate);
 			crate.setMap(this._map);
 			GameObjectDb.add(crate);
 			this.backLayer.add(crate);
