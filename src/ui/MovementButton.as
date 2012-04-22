@@ -14,14 +14,14 @@ package ui
 		private var _label:FlxText;
 		private var _text:String;
 		
-		public function MovementButton(x:int, y:int, onClick:Function, helpLabel:FlxText, helpText:String) 
+		public function MovementButton(x:int, y:int, imageClass:Class, onClick:Function, helpLabel:FlxText, helpText:String) 
 		{
 			super(x, y, null, onClick);
 			
 			this._label = helpLabel;
 			this._text	= helpText;
 			
-			this.loadGraphic(ResourceDb.gfx_ButtonForward, true, false, 16, 16);
+			this.loadGraphic(imageClass, true, false, 16, 16);
 			this.onOver = this.Handle_onOver;
 			this.onOut	= this.Handle_onOut;
 		

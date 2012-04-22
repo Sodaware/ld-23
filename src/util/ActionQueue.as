@@ -13,6 +13,11 @@ package util
 		private var _actions:Array;
 		private var _object:FlxSprite;
 		
+		public function getElements() : Array
+		{
+			return this._actions;
+		}
+		
 		public function ActionQueue() 
 		{
 			this._actions = new Array();
@@ -26,6 +31,11 @@ package util
 		public function isEmpty() : Boolean
 		{
 			return (this._actions.length == 0);
+		}
+		
+		public function getSize() : int
+		{
+			return this._actions.length;
 		}
 		
 		public function push(action:EntityAction) : int

@@ -1,7 +1,12 @@
 package objects 
 {
 	import components.BaseComponent;
+	import db.ResourceDb;
+	import flash.display.InteractiveObject;
+	import org.flixel.FlxSound;
 	import org.flixel.FlxSprite;
+	import org.flixel.FlxG;
+	import org.flixel.FlxTilemap;
 	
 	/**
 	 * ...
@@ -18,6 +23,13 @@ package objects
 		private var _direction:int = GameObject.DIR_DOWN;
 		
 		private var _components:Array;
+		private var _walkSound:FlxSound;
+		protected var _map:FlxTilemap;
+		
+		public function setMap(map:FlxTilemap) : void
+		{
+			this._map = map;
+		}
 		
 		public function getDirection() : int
 		{
@@ -42,6 +54,67 @@ package objects
 			}
 			
 			return -1;
+		}
+		
+		public function walk(endX:int, endY:int) : void
+		{
+			this.velocity.x = endX - this.x;
+			this.velocity.y = endY - this.y;
+			
+			this._walkSound = FlxG.play(ResourceDb.snd_Step, 1, true);
+			
+			switch (this._direction) 
+			{
+				case GameObject.DIR_LEFT:
+					this.play("walk_left");
+					break;
+
+				case GameObject.DIR_RIGHT:
+					this.play("walk_right");
+					break;
+
+				case GameObject.DIR_UP:
+					this.play("walk_up");
+					break;
+
+				case GameObject.DIR_DOWN:
+					this.play("walk_down");
+					break;
+					
+			}
+		}
+		
+		public function setDirection(dir:int = -1) : void
+		{
+			this._direction = dir;
+			this.stand();
+		}
+		
+		public function stand() : void
+		{
+			if (this._walkSound) {
+				this._walkSound.stop();
+			}
+			
+			switch (this._direction) 
+			{
+				case GameObject.DIR_LEFT:
+					this.play("stand_left");
+					break;
+
+				case GameObject.DIR_RIGHT:
+					this.play("stand_right");
+					break;
+
+				case GameObject.DIR_UP:
+					this.play("stand_up");
+					break;
+
+				case GameObject.DIR_DOWN:
+					this.play("stand_down");
+					break;
+					
+			}
 		}
 		
 		public override function update() : void

@@ -1,5 +1,7 @@
 package util.actions 
 {
+	import org.flixel.FlxSprite;
+	import org.flixel.plugin.photonstorm.FlxDelay;
 	import util.EntityAction;
 	import db.*;
 	import objects.GameObject;
@@ -10,11 +12,22 @@ package util.actions
 	 */
 	public class MoveEntityAction extends EntityAction 
 	{
+		private var _delay:FlxDelay;
+		protected var _endX:int;
+		protected var _endY:int;
 		
-		private var _endX:int;
-		private var _endY:int;
+		protected function _setEndPosition(xPos:int, yPos:int) : void
+		{
+			this._endX = xPos;
+			this._endY = yPos;
+		}
 		
-		public function MoveEntityAction(eventType:int) 
+		protected function _updateEntityAnim() : void
+		{
+			this._entity.walk(this._endX, this._endY);
+		}
+		
+		public function MoveEntityAction(eventType:int = 0) 
 		{
 			super(eventType);
 		}
@@ -24,7 +37,8 @@ package util.actions
 		{
 			super.update();
 			
-			if (Math.round(this._entity.x) == this._endX) { 
+			if (Math.round(this._entity.x) == this._endX) {
+				// TODO: Call "entity.stop"
 				this._entity.velocity.x = 0;
 				this._entity.x = Math.round(this._entity.x);
 			}
@@ -34,32 +48,22 @@ package util.actions
 				this._entity.velocity.y = 0;
 				this._entity.y = Math.round(this._entity.y);
 			}
-			
-			if (this._entity.velocity.x == 0 && this._entity.velocity.y == 0) {
+
+			if (this._delay && this._delay.hasExpired) {
 				this._isFinished = true;
+				this._entity.stand();
 			}
+	
 		}
 		
 		public override function execute() : void
 		{
-			// Yes, this is horrible. Want to move it to a strategy type class.
-			switch (this._eventType) 
-			{
-				case ContentDb.ACTION_MOVE_FORWARD:
-					trace("Moving forward!");
-					if (this._entity.getDirection() == GameObject.DIR_DOWN) {
-						this._entity.play("walk_down");
-						
-						this._endX = this._entity.x;
-						this._endY = this._entity.y + 16;
-						
-						this._entity.velocity.y = 16;
-						
-					}
-					break;
-				default:
-			}
+			this._delay = new FlxDelay(1200);
+			this._delay.start();
 		}
+		
 	}
 
+	
+	
 }

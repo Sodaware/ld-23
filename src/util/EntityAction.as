@@ -5,9 +5,11 @@ package util
 	import org.flixel.FlxParticle;
 	import org.flixel.FlxPath;
 	import org.flixel.FlxG;
+	import org.flixel.FlxSprite;
 	
 	/**
-	 * ...
+	 * An action that can be carried out by an entity.
+	 * 
 	 * @author Phil Newton
 	 */
 	public class EntityAction 
@@ -37,6 +39,15 @@ package util
 		}
 		
 		public function execute() : void
+		{
+			
+		}
+		
+		/**
+		 * Moves a sprite without animating it.
+		 * @param	sprite
+		 */
+		public function evaluate(sprite:GameObject) : void
 		{
 			
 		}

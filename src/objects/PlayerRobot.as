@@ -3,6 +3,7 @@ package objects
 	import components.*;
 	import org.flixel.FlxSprite;
 	import db.ResourceDb;
+	import org.flixel.FlxTilemap;
 	import util.EntityAction;
 	
 	
@@ -15,11 +16,13 @@ package objects
 		
 		private var _movement:MoveableObjectComponent;
 		
+		
 		public function PlayerRobot(xPos:int, yPos:int)
 		{
 			super(xPos, yPos);
 			
 			this._movement = new MoveableObjectComponent();
+			this._movement.setMaxSize(4);
 			
 			this.addComponent(this._movement);
 			
@@ -35,6 +38,8 @@ package objects
 			this.addAnimation("walk_up", [6, 7], 4);
 			
 			this.play("stand_down");
+			
+	
 		}
 		
 		public function addAction(action:EntityAction) : void 
