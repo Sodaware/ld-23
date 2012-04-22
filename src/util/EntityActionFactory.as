@@ -38,6 +38,10 @@ package util
 				case ContentDb.ACTION_SHOOT:
 					return new FireWeaponAction(actionType, args);
 					break;
+					
+				case ContentDb.ACTION_SCAN:
+					return new ScanObjectAction(actionType, args);
+					break;
 				
 				default:
 					return null;

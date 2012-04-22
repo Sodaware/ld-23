@@ -19,6 +19,7 @@ package objects
 		protected var _movement:MoveableObjectComponent;
 		protected var _brain:BrainComponent;
 		protected var _body:ShootableComponent;
+		protected var _scannable:ScannableComponent;
 		
 		public function AnimalObject(xPos:int, yPos:int, args:Object)
 		{
@@ -35,6 +36,7 @@ package objects
 			this.addComponent(this._movement);
 			this.addComponent(this._brain);
 			this.addComponent(this._body);
+			this.addComponent(new ScannableComponent());
 			
 			this.loadGraphic(args["sprite"], true, false, 16, 16);
 			this.addAnimation("stand_down", [0, 1], 2);
@@ -48,19 +50,6 @@ package objects
 			this.addAnimation("walk_up", [6, 7], 4);
 			
 			this.play("stand_down");
-			
-			// Listen for the "go" button being pressed (so the enemy can calculate moves)
-			// Would like to delegate this down to the component level (in the brain section)
-			GameEventDispatcher.getInstance().addEventListener(GameEventDispatcher.EVENT_GO_PRESSED, this.Handle_beforeTurnStart);
-			
-		}
-		
-		private function Handle_beforeTurnStart(e:TurnStartEvent) : void
-		{
-			// Add stuff
-			for (var i:int = 0; i < e.playerQueueSize; i++) {
-				//this._movement.addAction(EntityActionFactory.create(ContentDb.ACTION_SHOOT, { target: GameObjectDb.find("player") } ));
-			}
 			
 		}
 		

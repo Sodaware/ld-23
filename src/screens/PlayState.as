@@ -66,6 +66,7 @@ package screens
 		
 		// State
 		private var _targetModeEnabled:Boolean = false;
+		private var _scanModeEnabled:Boolean = false;
 		
 		
 		// ----------------------------------------------------------------------
@@ -77,50 +78,9 @@ package screens
 			
 			super.update();
 			
-			// Handle targetting mode
-			if (this._targetModeEnabled) {
-				var enemyOver:GameObject = null;
-				for each (var enemy:GameObject in GameObjectDb.getObjectsWithComponent(ShootableComponent)) {
-					
-					if (enemy.isMouseOver() && enemy != this._player) {
-						enemyOver = enemy;
-						break;
-					}
-				}
-				
-				if (enemyOver) {
-					
-					if (!this._infoWindow) {
-						this._infoWindow = new InfoWindow(enemyOver, 0, 118, 160, 34);
-						this.add(this._infoWindow);
-					}
-					
-					if (FlxG.mouse.pressed()) {
-						if (this._rangeGrid.isObjectInGrid(enemyOver)) {
-							// Select as target
-							var playerQueueComponent:MoveableObjectComponent = MoveableObjectComponent(this._player.getComponent(MoveableObjectComponent));
-							var button:FlxSprite = this._queueButtons[playerQueueComponent.getSize()];
-							button.play("button_use_weapon");
-							playerQueueComponent.addAction(EntityActionFactory.create(ContentDb.ACTION_SHOOT, {target: enemyOver}));
-							this._indicator.refresh();
-							this.disableTargetMode();
-							this.disableInfoWindow();
-							
-						} else {
-							this.add(new AlertBox("Not in range", 36, 10, 92, 22));
-						}
-					}
-					
-				} else {
-					if (this._infoWindow) {
-						this.disableInfoWindow();
-					}
-					
-					if (FlxG.mouse.pressed()) {
-						this.disableTargetMode();
-					}
-				}
-			}
+			// Handle attack mode / scan mode
+			if (this._targetModeEnabled)	updateTargetMode();
+			if (this._scanModeEnabled) 		updateScanMode();
 			
 		}
 		
@@ -151,7 +111,17 @@ package screens
 				
 			this._rangeGrid.destroy();
 			this._textBox.destroy();
-						
+		}
+		
+		public function disableScanMode() : void
+		{
+			this._scanModeEnabled = false;
+			
+			this.backLayer.remove(this._rangeGrid);
+			this.uiLayer.remove(this._textBox);
+				
+			this._rangeGrid.destroy();
+			this._textBox.destroy();
 		}
 
 		
@@ -333,6 +303,41 @@ package screens
 			
 		}
 		
+		private function Handle_buttonScanObjectClick() : void
+		{
+			// Check palyer can target anything
+			var playerQueueComponent:MoveableObjectComponent = this._player.getComponent(MoveableObjectComponent) as MoveableObjectComponent;
+			if (playerQueueComponent.isFull()) {
+				// play a sound?
+				return;
+			}
+			
+			// Check for animals in range
+			var somethingInRange:Boolean = false;
+			
+			// TODO: Update this to use range of the equipped weapon (when/if different weapons get added)
+			this._rangeGrid = new RangeGrid(this._indicator.getSpriteObject(), 4, 0x22FF22);
+			this.backLayer.add(this._rangeGrid);
+			
+			for each (var animal:GameObject in GameObjectDb.getObjectsWithComponent(ScannableComponent)) {
+				if (this._player != animal && this._rangeGrid.isObjectInGrid(animal)) {
+					somethingInRange = true;
+				}
+			}
+			
+			if (!somethingInRange) {
+				this.uiLayer.add(new AlertBox("Nothing in Range", 36, 10, 92, 22));
+				this.backLayer.remove(this._rangeGrid);
+				this._rangeGrid.destroy();
+				return;
+			}
+			
+			this._textBox = new MessageBox("Select Target", 48, 10, 80, 22);
+			this.uiLayer.add(this._textBox);
+			this._scanModeEnabled = true;
+			
+		}
+		
 		/**
 		 * Called the "move forward" button is clicked
 		 */
@@ -421,6 +426,95 @@ package screens
 			this._infoWindow = null;
 		}
 		
+		private function updateTargetMode():void 
+		{
+			var enemyOver:GameObject = this.getHoverObject(ShootableComponent);
+			if (enemyOver) {
+				
+				if (!this._infoWindow) {
+					this._infoWindow = new InfoWindow(enemyOver, 0, 118, 160, 34);
+					this.add(this._infoWindow);
+				}
+				
+				if (FlxG.mouse.pressed()) {
+					if (this._rangeGrid.isObjectInGrid(enemyOver)) {
+						// Select as target
+						var playerQueueComponent:MoveableObjectComponent = MoveableObjectComponent(this._player.getComponent(MoveableObjectComponent));
+						var button:FlxSprite = this._queueButtons[playerQueueComponent.getSize()];
+						button.play("button_use_weapon");
+						playerQueueComponent.addAction(EntityActionFactory.create(ContentDb.ACTION_SHOOT, {target: enemyOver}));
+						this._indicator.refresh();
+						this.disableTargetMode();
+						this.disableInfoWindow();
+						
+					} else {
+						this.add(new AlertBox("Not in range", 36, 10, 92, 22));
+					}
+				}
+				
+			} else {
+				if (this._infoWindow) {
+					this.disableInfoWindow();
+				}
+				
+				if (FlxG.mouse.pressed()) {
+					this.disableTargetMode();
+				}
+			}
+		}
+		
+		
+		
+		private function updateScanMode():void 
+		{
+			var animalOver:GameObject = this.getHoverObject(ScannableComponent);
+			
+			if (animalOver) {
+				
+				if (!this._infoWindow) {
+					this._infoWindow = new InfoWindow(animalOver, 0, 118, 160, 34);
+					this.add(this._infoWindow);
+				}
+				
+				if (FlxG.mouse.pressed()) {
+					if (this._rangeGrid.isObjectInGrid(animalOver)) {
+						// Select as target
+						var playerQueueComponent:MoveableObjectComponent = MoveableObjectComponent(this._player.getComponent(MoveableObjectComponent));
+						var button:FlxSprite = this._queueButtons[playerQueueComponent.getSize()];
+						button.play("button_use_scanner");
+						playerQueueComponent.addAction(EntityActionFactory.create(ContentDb.ACTION_SCAN, {target: animalOver}));
+						this._indicator.refresh();
+						this.disableScanMode();
+						this.disableInfoWindow();
+						
+					} else {
+						this.add(new AlertBox("Not in range", 36, 10, 92, 22));
+					}
+				}
+				
+			} else {
+				if (this._infoWindow) {
+					this.disableInfoWindow();
+				}
+				
+				if (FlxG.mouse.pressed()) {
+					this.disableTargetMode();
+				}
+			}
+		}
+		
+		private function getHoverObject(component:Class) : GameObject
+		{
+			for each (var entity:GameObject in GameObjectDb.getObjectsWithComponent(component)) {
+				
+				if (entity.isMouseOver() && entity != this._player) {
+					return entity;
+				}
+			}
+			
+			return null;
+		}
+		
 		override public function create() : void
 		{
 			// Moose
@@ -477,6 +571,7 @@ package screens
 			var stepRight:MovementButton	= new MovementButton(69, 136, ResourceDb.gfx_ButtonStepRight, this.Handle_buttonStepRightClick, this._help, "Step Right");
 			
 			var fireWeapon:MovementButton	= new MovementButton(86, 136, ResourceDb.gfx_ButtonFireWeapon, this.Handle_buttonFireWeaponClick, this._help, "Fire Weapon");
+			var scanObject:MovementButton	= new MovementButton(103, 136, ResourceDb.gfx_ButtonScanObject, this.Handle_buttonScanObjectClick, this._help, "Scan Object");
 			
 			this.movementButtons.add(forward);
 			this.movementButtons.add(turnRight);
@@ -484,6 +579,7 @@ package screens
 			this.movementButtons.add(stepLeft);
 			this.movementButtons.add(stepRight);
 			this.movementButtons.add(fireWeapon);
+			this.movementButtons.add(scanObject);
 			
 			// GO button!
 			this._goButton = new FlxButton(127, 120, "", this.Handle_onGoClick);
@@ -501,6 +597,7 @@ package screens
 			this.uiLayer.add(stepRight);
 			
 			this.uiLayer.add(fireWeapon);
+			this.uiLayer.add(scanObject);
 			this.uiLayer.add(this._currentMove);
 			
 			this.uiLayer.add(this._goButton);	

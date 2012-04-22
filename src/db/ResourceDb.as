@@ -55,6 +55,8 @@ package db
 		[Embed(source = "../../content/ui/button-step_right.png")] public static var gfx_ButtonStepRight:Class;
 		
 		[Embed(source = "../../content/ui/button-fire_weapon.png")] public static var gfx_ButtonFireWeapon:Class;
+		[Embed(source = "../../content/ui/button-scan_item.png")] public static var gfx_ButtonScanObject:Class;
+		[Embed(source = "../../content/ui/button-use_item.png")] public static var gfx_ButtonUseItem:Class;
 
 
 		[Embed(source = "../../content/ui/cursor.png")] public static var gfx_Cursor:Class;
