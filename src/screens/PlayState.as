@@ -1,11 +1,16 @@
 package screens 
 {
+	import events.DamageEvent;
+	import events.GameEventDispatcher;
+	import flash.events.EventDispatcher;
 	import flash.media.ID3Info;
 	import mx.core.FlexSprite;
 	import org.flixel.FlxBasic;
 	import org.flixel.FlxButton;
 	import org.flixel.FlxCamera;
+	import org.flixel.FlxEmitter;
 	import org.flixel.FlxG;
+	import org.flixel.FlxParticle;
 	import org.flixel.FlxU;
 	import org.flixel.FlxGroup;
 	import org.flixel.FlxRect;
@@ -14,6 +19,7 @@ package screens
 	import org.flixel.FlxText;
 	import org.flixel.FlxTilemap;
 	import org.flixel.plugin.photonstorm.FlxButtonPlus;
+	import particles.FlyoffParticle;
 
 	import ui.*;
 	import util.*;
@@ -56,6 +62,7 @@ package screens
 		
 		private var _targetModeEnabled:Boolean = false;
 		
+		private var _flyoffs:FlxEmitter;
 		
 		override public function update():void 
 		{
@@ -63,7 +70,7 @@ package screens
 			
 			if (this._targetModeEnabled) {
 				var enemyOver:GameObject = null;
-				for each (var enemy:GameObject in GameObjectDb.getObjectsWithComponent(EnemyComponent)) {
+				for each (var enemy:GameObject in GameObjectDb.getObjectsWithComponent(ShootableComponent)) {
 					
 					if (enemy.isMouseOver()) {
 						enemyOver = enemy;
@@ -128,9 +135,17 @@ package screens
 				return;
 			}
 			
+			// Create the action
+			var action:EntityAction = EntityActionFactory.create(movementType);
+			if (!action.canPerform(this._indicator.getSpriteObject())) {
+				this.add(new AlertBox("Invalid Move", 36, 10, 76, 22));
+				return;
+			}
+
 			var button:FlxSprite = this._queueButtons[playerQueueComponent.getSize()];
 			button.play(movementName);
-			this._player.addAction(EntityActionFactory.create(movementType));
+			
+			this._player.addAction(action);
 			this._indicator.refresh();
 			
 		}
@@ -167,11 +182,11 @@ package screens
 			var somethingInRange:Boolean = false;
 			
 			// TODO: Update this to use range of the equipped weapon (when/if different weapons get added)
-			this._rangeGrid = new RangeGrid(this._indicator.getSpriteObject(), 1, 0xFF2222);
+			this._rangeGrid = new RangeGrid(this._indicator.getSpriteObject(), 2, 0xFF2222);
 			this.backLayer.add(this._rangeGrid);
 			
-			for each (var enemy:GameObject in GameObjectDb.getObjectsWithComponent(EnemyComponent)) {
-				if (this._rangeGrid.isObjectInGrid(enemy)) {
+			for each (var enemy:GameObject in GameObjectDb.getObjectsWithComponent(ShootableComponent)) {
+				if (this._player != enemy && this._rangeGrid.isObjectInGrid(enemy)) {
 					somethingInRange = true;
 				}
 			}
@@ -209,7 +224,19 @@ package screens
 		
 		
 		// ----------------------------------------------------------------------
-		// -- Creation / Destruction
+		// -- Event Handlers
+		// ----------------------------------------------------------------------
+		
+		public function Handle_onDamageEvent(e:DamageEvent) : void
+		{
+			var flyOff:FlyoffParticle = new FlyoffParticle(e.getDamage().toString(), e.getEntity().x, e.getEntity().y);
+			this.uiLayer.add(flyOff);
+			
+		}
+		
+		
+		// ----------------------------------------------------------------------
+		// -- Creation / Setup
 		// ----------------------------------------------------------------------
 		
 		private function setupActionQueue() : void
@@ -272,6 +299,8 @@ package screens
 			this.setupBackground();
 			this.setupPlayer();
 			this.setupCamera();
+			
+			GameEventDispatcher.getInstance().addEventListener(GameEventDispatcher.EVENT_DAMAGE, this.Handle_onDamageEvent);
 			
 			FlxG.mouse.load(ResourceDb.gfx_Cursor, 2);
 			
@@ -344,8 +373,14 @@ package screens
 			
 			// Temp code
 			this._enemy = new EvilRobotObject(32, 64, ResourceDb.gfx_EvilRobot);
+			this._enemy.setMap(this._map);
 			GameObjectDb.add(this._enemy);
 			this.backLayer.add(this._enemy);
+
+			var crate:StationaryObject = new StationaryObject(16, 32, ResourceDb.gfx_Crate);
+			crate.setMap(this._map);
+			GameObjectDb.add(crate);
+			this.backLayer.add(crate);
 
 			
 			// FlxG.camera.follow(this._player);

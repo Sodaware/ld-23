@@ -40,11 +40,29 @@ package util
 			
 		}
 		
+		
 		public function isFinished() : Boolean
 		{
 			return this._isFinished;
 		}
 		
+		
+		// ----------------------------------------------------------------------
+		// -- Action Querying / Execution
+		// ----------------------------------------------------------------------
+		
+		/**
+		 * Check if the sprite can add this action to its queue. Used to check for
+		 * collisions.
+		 * 
+		 * @param	sprite
+		 * @return  True if can do, false if not.
+		 */
+		public function canPerform(sprite:GameObject) : Boolean
+		{
+			return true;
+		}
+
 		public function execute() : void
 		{
 			

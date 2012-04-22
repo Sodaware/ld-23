@@ -36,6 +36,10 @@ package ui
 			this.add(frameOuter);
 			this.add(frameInner);
 			this.add(this._message);
+			
+			frameOuter.scrollFactor.x = frameOuter.scrollFactor.y = 0;
+			frameInner.scrollFactor.x = frameInner.scrollFactor.y = 0;
+			this._message.scrollFactor.x = this._message.scrollFactor.y = 0;
 		
 		}
 		

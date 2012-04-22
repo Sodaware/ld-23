@@ -12,9 +12,26 @@ package db
 		// Sounds
 		[Embed(source = "../../content/sounds/walk.mp3")] public static var snd_Step:Class;
 		
+		[Embed(source = '../../content/sounds/hit1.mp3')] public static var snd_Hit1:Class;
+		[Embed(source = '../../content/sounds/hit2.mp3')] public static var snd_Hit2:Class;
+		[Embed(source = '../../content/sounds/hit3.mp3')] public static var snd_Hit3:Class;
+		public static var snd_Hits:Array = [snd_Hit1, snd_Hit2, snd_Hit3];
+		
+		[Embed(source = '../../content/sounds/shoot1.mp3')] public static var snd_Shoot1:Class;
+		[Embed(source = '../../content/sounds/shoot2.mp3')] public static var snd_Shoot2:Class;
+		[Embed(source = '../../content/sounds/shoot3.mp3')] public static var snd_Shoot3:Class;
+		public static var snd_Shots:Array = [snd_Shoot1, snd_Shoot2, snd_Shoot3];
+		
+		[Embed(source = '../../content/sounds/explosion1.mp3')] public static var snd_Explosion1:Class;
+		[Embed(source = '../../content/sounds/explosion2.mp3')] public static var snd_Explosion2:Class;
+		[Embed(source = '../../content/sounds/explosion3.mp3')] public static var snd_Explosion3:Class;
+		public static var snd_Explosions:Array = [snd_Explosion1, snd_Explosion2, snd_Explosion3];
+		
+		
 		// Sprites etc
 		[Embed(source = "../../content/sprites/player.png")] public static var gfx_Player:Class;
 		[Embed(source = "../../content/sprites/evil_robot.png")] public static var gfx_EvilRobot:Class;
+		[Embed(source = "../../content/sprites/crate.png")] public static var gfx_Crate:Class;
 		
 		// Bullets / Explosions
 		[Embed(source = "../../content/sprites/bullet.png")] public static var gfx_Bullet:Class;

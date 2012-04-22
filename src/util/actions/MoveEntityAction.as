@@ -1,5 +1,6 @@
 package util.actions 
 {
+	import components.ShootableComponent;
 	import org.flixel.FlxSprite;
 	import org.flixel.plugin.photonstorm.FlxDelay;
 	import util.EntityAction;
@@ -32,6 +33,35 @@ package util.actions
 			super(eventType);
 		}
 		
+		/**
+		 * Check if the entity can move to a new position.
+		 * 
+		 * @param	entity
+		 * @param	xPos
+		 * @param	yPos
+		 * @return
+		 */
+		public function canMove(entity:GameObject, xPos:int, yPos:int) : Boolean
+		{
+			// Check map tiles
+			var tileX:int 	= xPos / 16;
+			var tileY:int 	= yPos / 16;
+			var tileId:int	= entity.getMap().getTile(tileX, tileY);
+			
+			if (tileId >= 4) {
+				return false;
+			}
+			
+			// Check for entities
+			for each (var obj:GameObject in GameObjectDb.getObjectsWithComponent(ShootableComponent)) {
+				if (obj.x == xPos && obj.y == yPos) {
+					return false;
+				}
+			}
+			
+			return true;
+			
+		}
 		
 		public override function update()  : void
 		{

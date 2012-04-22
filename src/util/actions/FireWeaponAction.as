@@ -45,8 +45,10 @@ package util.actions
 				return;
 			}
 			
-			bullet.velocity.x = (this._entity.x - target.x);
-			bullet.velocity.y = -(this._entity.y - target.y);
+			FlxG.play(ResourceDb.snd_Shoot1);
+			
+			bullet.velocity.x = -2 * (this._entity.x - target.x);
+			bullet.velocity.y = -2 * (this._entity.y - target.y);
 
 			FlxG.state.add(bullet);
 

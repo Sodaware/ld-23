@@ -17,7 +17,7 @@ package ui
 		
 		public function AlertBox(message:String, xPos:int, yPos:int, width:int, height:int, centerX:Boolean = true) 
 		{
-		//	super();
+			
 			super(message, xPos, yPos, width, height, centerX);
 			if (centerX) {
 				xPos = (FlxG.camera.width - width) / 2;
@@ -37,6 +37,10 @@ package ui
 			this.add(frameOuter);
 			this.add(frameInner);
 			this.add(this._message);
+			
+			frameOuter.scrollFactor.x = frameOuter.scrollFactor.y = 0;
+			frameInner.scrollFactor.x = frameInner.scrollFactor.y = 0;
+			this._message.scrollFactor.x = this._message.scrollFactor.y = 0;
 			
 			this._lifespan = new FlxDelay(1200);
 			this._lifespan.callback = this.onFinish;

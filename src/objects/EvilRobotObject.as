@@ -41,7 +41,6 @@ package objects
 			
 			this.play("stand_down");
 			
-	
 		}
 		
 	}

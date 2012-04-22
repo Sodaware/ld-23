@@ -49,6 +49,11 @@ package objects
 			this._map = map;
 		}
 		
+		public function getMap() : FlxTilemap
+		{
+			return this._map;
+		}
+		
 		public function getDirection() : int
 		{
 			return this._direction;

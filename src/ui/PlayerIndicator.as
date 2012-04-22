@@ -35,6 +35,7 @@ package ui
 			this._sprite.addAnimation("stand_right", [1]);
 			this._sprite.addAnimation("stand_down", [2]);
 			this._sprite.addAnimation("stand_left", [3]);
+			this._sprite.setMap(this._player.getMap());
 			
 			this._sprite.play("stand_down");
 			this.add(this._sprite);

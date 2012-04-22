@@ -62,6 +62,39 @@ package util.actions
 			
 		}
 		
+		/**
+		 * Check if an entity can move forwards.
+		 * 
+		 * @param	entity
+		 * @return
+		 */
+		public override function canPerform(entity:GameObject) : Boolean
+		{
+			
+			switch (entity.getDirection()) { 
+				
+				case GameObject.DIR_DOWN:
+					return (this.canMove(entity, entity.x, entity.y + 16));
+					break;
+					
+				case GameObject.DIR_LEFT:
+					return (this.canMove(entity, entity.x - 16, entity.y));
+					break;
+					
+				case GameObject.DIR_UP:
+					return (this.canMove(entity, entity.x, entity.y - 16));
+					break;
+					
+				case GameObject.DIR_RIGHT:
+					return (this.canMove(entity, entity.x + 16, entity.y));
+					break;
+					
+			}
+			
+			return false;
+			
+		}
+		
 	}
 
 }
