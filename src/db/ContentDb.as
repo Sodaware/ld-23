@@ -17,6 +17,10 @@ package db
 		public static const ACTION_SCAN:int = 9;
 		
 		
+		// 0.025
+		public static const TRANSITION_SPEED:Number = 1.0;
+		
+		
 		
 	}
 }

@@ -2,9 +2,11 @@ package objects
 {
 	import components.InventoryComponent;
 	import db.ResourceDb;
+	
 	/**
 	 * Just a simple crate. Like a standard stationary object, but has an inventory
 	 * that can contain an optional item.
+	 * 
 	 * @author Phil Newton
 	 */
 	public class CrateObject extends StationaryObject 
@@ -18,9 +20,7 @@ package objects
 			
 			this._inventory = new InventoryComponent();
 		
-			// Add something or other
-			this._inventory.addItem(new EvilRobotObject(this.x, this.y, ResourceDb.gfx_EvilRobot));
-			
+			// Add something or other			
 			this.addComponent(this._inventory);
 		}
 		

@@ -423,6 +423,9 @@ package screens
 		
 		override public function create() : void
 		{
+			// Moose
+			FlxG.mouse.load(ResourceDb.gfx_Cursor, 2);
+			
 			this.setupActionQueue();
 			this.setupBackground();
 			this.setupPlayer();
@@ -431,7 +434,7 @@ package screens
 			GameEventDispatcher.getInstance().addEventListener(GameEventDispatcher.EVENT_DAMAGE, this.Handle_onDamageEvent);
 			GameEventDispatcher.getInstance().addEventListener(GameEventDispatcher.EVENT_MOVE_COMPLETED, this.Handle_onPlayerMoveCompleted);
 			
-			FlxG.mouse.load(ResourceDb.gfx_Cursor, 2);
+			
 			
 			this.uiLayer = new FlxGroup();
 			//this.uiLayer.add(this._indicator);
@@ -523,6 +526,12 @@ package screens
 			this._enemy.setMap(this._map);
 			GameObjectDb.add(this._enemy);
 			
+			var aminal:AnimalObject = new AnimalObject(64, 64, {
+				name: "BushMan",
+				sprite: ResourceDb.gfx_AnimalBushman
+			});
+			aminal.setMap(this._map);
+			GameObjectDb.add(aminal);
 
 			var crate:CrateObject = new CrateObject(16, 32, ResourceDb.gfx_Crate);
 			crate.setMap(this._map);

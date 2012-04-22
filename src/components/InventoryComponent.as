@@ -7,7 +7,8 @@ package components
 	import org.flixel.FlxG;
 	
 	/**
-	 * An inventory contains usable items
+	 * An inventory contains usable items.
+	 * 
 	 * @author Phil Newton
 	 */
 	public class InventoryComponent extends BaseComponent
@@ -24,6 +25,7 @@ package components
 			GameEventDispatcher.getInstance().addEventListener(GameEventDispatcher.EVENT_DAMAGE, this.Handle_onParentDamaged);
 		}
 		
+		// TODO: Should probably change this to a non-game object (as 99% of inventory items don't need to be rendered)
 		public function addItem(item:GameObject) : void
 		{
 			// Deactivate the item (so it doesn't do anything unexpected)

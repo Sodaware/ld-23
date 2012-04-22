@@ -27,6 +27,11 @@ package db
 		[Embed(source = '../../content/sounds/explosion3.mp3')] public static var snd_Explosion3:Class;
 		public static var snd_Explosions:Array = [snd_Explosion1, snd_Explosion2, snd_Explosion3];
 		
+		// Zone icons
+		[Embed(source = "../../content/zones/icon-temperate.png")] public static var gfx_ZoneIconTemperate:Class;
+		
+		// Aminals
+		[Embed(source = "../../content/sprites/animal-bushman.png")] public static var gfx_AnimalBushman:Class;
 		
 		// Sprites etc
 		[Embed(source = "../../content/sprites/player.png")] public static var gfx_Player:Class;
