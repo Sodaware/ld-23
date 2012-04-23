@@ -20,6 +20,7 @@ package screens
 	import org.flixel.FlxState;
 	import org.flixel.FlxText;
 	import org.flixel.FlxTilemap;
+	import overlays.ModeSelectScreenOverlay;
 	import particles.FlyoffParticle;
 
 	import ui.*;
@@ -67,6 +68,8 @@ package screens
 		// State
 		private var _targetModeEnabled:Boolean = false;
 		private var _scanModeEnabled:Boolean = false;
+		
+		private var _zone:String;
 		
 		
 		// ----------------------------------------------------------------------
@@ -185,7 +188,8 @@ package screens
 		}
 		
 		/**
-		 * Triggered when the player's movement queue is empty.
+		 * Triggered when the player's movement queue is empty (i.e. their turn
+		 * has finished).
 		 * @param	player
 		 */
 		public function Handle_onPlayerQueueEmpty(player:GameObject) : void
@@ -207,6 +211,20 @@ package screens
 			// Toggle UI elements
 			this._indicator.visible		= true;
 			this._currentMove.visible	= false;
+			
+			// Check for end states
+			if (ShootableComponent(player.getComponent(ShootableComponent)).health <= 0) {
+				this.add(new ConfirmationBox("You have died. Bad show", this.Handle_onDeath));
+				this.disableMovementButtons();
+				return;
+			} 
+
+			if (GameObjectDb.getObjectsWithComponent(BombComponent).length == 0) {
+				this.add(new ConfirmationBox("All Bombs Destroyed. Good show", this.Handle_onAllBombsDestroyed));
+				this.disableMovementButtons();
+				return;
+			} 
+
 		}
 		
 		/**
@@ -222,6 +240,24 @@ package screens
 			
 			// Adjust movement indicator
 			this._currentMove.x += 17;
+		}
+		
+		
+		public function Handle_onAllBombsDestroyed() : void
+		{
+			var state:TitleScreenState = new TitleScreenState();
+			GameObjectDb.clear();
+			
+			state.setOverlay(ModeSelectScreenOverlay);
+			FlxG.switchState(state);
+		
+		}
+		
+		public function Handle_onDeath() : void
+		{
+			var state:TitleScreenState = new TitleScreenState();
+			GameObjectDb.clear();
+			FlxG.switchState(state);
 		}
 		
 		
@@ -291,7 +327,7 @@ package screens
 			}
 			
 			if (!somethingInRange) {
-				this.uiLayer.add(new AlertBox("Nothing in Range", 36, 10, 92, 22));
+				this.uiLayer.add(new AlertBox("Nothing in Range", 36, 10, 112, 22));
 				this.backLayer.remove(this._rangeGrid);
 				this._rangeGrid.destroy();
 				return;
@@ -395,8 +431,21 @@ package screens
 			// Setup the map
 			this._map = new FlxTilemap();
 			
-			// TODO: Load this from the session
-			this._map.loadMap(new ResourceDb.map_Temperate1, ResourceDb.gfx_TemperateTiles, 16, 16);
+			switch (this._zone) {
+				case "zone_temperate":
+					this._map.loadMap(new ResourceDb.map_Temperate1, ResourceDb.gfx_TemperateTiles, 16, 16);
+					break;
+				
+				case "zone_tundra":
+					this._map.loadMap(new ResourceDb.map_Tundra1, ResourceDb.gfx_TundraTiles, 16, 16);
+					break;
+
+				case "zone_desert":
+					this._map.loadMap(new ResourceDb.map_Desert1, ResourceDb.gfx_DesertTiles, 16, 16);
+					break;
+
+			}
+			
 			
 			FlxG.worldBounds = new FlxRect(0, 0, this._map.width, this._map.height);
 			
@@ -472,7 +521,7 @@ package screens
 			if (animalOver) {
 				
 				if (!this._infoWindow) {
-					this._infoWindow = new InfoWindow(animalOver, 0, 118, 160, 34);
+					this._infoWindow = new AnimalInfoWindow(animalOver as AnimalObject, 0, 118, 160, 34);
 					this.add(this._infoWindow);
 				}
 				
@@ -515,20 +564,105 @@ package screens
 			return null;
 		}
 		
-		override public function create() : void
+		private function setupObjects() : void
 		{
+			// Replace special tiles with entities
+			for (var yPos:int = 0; yPos < this._map.heightInTiles; yPos++) {
+				for (var xPos:int = 0; xPos < this._map.widthInTiles; xPos++) {
+					var tileId:int = this._map.getTile(xPos, yPos);
+					
+					switch (tileId) 
+					{
+						
+						case 6:				// --CRATE
+							
+							// Replace old tile
+							this._map.setTile(xPos, yPos, 1);
+							
+							// Make + add crate
+							var crate:CrateObject = new CrateObject(xPos * 16, yPos * 16, ResourceDb.gfx_Crate);
+							crate.setMap(this._map);
+							GameObjectDb.add(crate);
+							
+							break;
+							
+						case 8:				// --BOMB THING
+							
+							// Replace old tile
+							this._map.setTile(xPos, yPos, 1);
+							
+							// Make + add crate
+							var bomb:BombObject = new BombObject(xPos * 16, yPos * 16, ResourceDb.gfx_Bomb);
+							bomb.setMap(this._map);
+							GameObjectDb.add(bomb);
+							
+							break;
+							
+						case 11:				// --Evil Robot
+							
+							// Replace old tile
+							this._map.setTile(xPos, yPos, 1);
+							
+							// Make + add crate
+							var robot:EvilRobotObject = new EvilRobotObject(xPos * 16, yPos * 16, ResourceDb.gfx_EvilRobot);
+							robot.setMap(this._map);
+							GameObjectDb.add(robot);
+							
+							break;
+							
+						case 12:				// Animals!
+							
+							// Replace old tile
+							this._map.setTile(xPos, yPos, 1);
+							var animal:AnimalObject = new AnimalObject(xPos * 16, yPos * 16, "bushman");
+							animal.setMap(this._map);
+							GameObjectDb.add(animal);
+							break;
+							
+						case 13:				// Animals!
+							
+							// Replace old tile
+							this._map.setTile(xPos, yPos, 1);
+							var animal:AnimalObject = new AnimalObject(xPos * 16, yPos * 16, "space_bear");
+							animal.setMap(this._map);
+							GameObjectDb.add(animal);
+							break;
+							
+						case 14:				// Animals!
+							
+							// Replace old tile
+							this._map.setTile(xPos, yPos, 1);
+							var animal:AnimalObject = new AnimalObject(xPos * 16, yPos * 16, "space_snake");
+							animal.setMap(this._map);
+							GameObjectDb.add(animal);
+							
+							break;
+							
+							
+							
+						default:
+							break;
+					}
+				}
+			}
+		}
+		
+		public function PlayState(zone:String)
+		{
+			this._zone = zone;
+
 			// Moose
+			
 			FlxG.mouse.load(ResourceDb.gfx_Cursor, 2);
 			
 			this.setupActionQueue();
 			this.setupBackground();
 			this.setupPlayer();
 			this.setupCamera();
+			this.setupObjects();
 			
-			GameEventDispatcher.getInstance().addEventListener(GameEventDispatcher.EVENT_DAMAGE, this.Handle_onDamageEvent);
-			GameEventDispatcher.getInstance().addEventListener(GameEventDispatcher.EVENT_MOVE_COMPLETED, this.Handle_onPlayerMoveCompleted);
-			
-			
+			GameEventDispatcher.getInstance().addEventListener(GameEventDispatcher.EVENT_DAMAGE, this.Handle_onDamageEvent, false, 0, true);
+			GameEventDispatcher.getInstance().addEventListener(GameEventDispatcher.EVENT_MOVE_COMPLETED, this.Handle_onPlayerMoveCompleted, false, 0, true);
 			
 			this.uiLayer = new FlxGroup();
 			//this.uiLayer.add(this._indicator);
@@ -618,23 +752,9 @@ package screens
 			
 			this.uiLayer.add(this._currentMove);
 			
-			// Temp code
-			this._enemy = new EvilRobotObject(32, 64, ResourceDb.gfx_EvilRobot);
-			this._enemy.setMap(this._map);
-			GameObjectDb.add(this._enemy);
-			
-			var aminal:AnimalObject = new AnimalObject(64, 64, {
-				name: "BushMan",
-				sprite: ResourceDb.gfx_AnimalBushman
-			});
-			aminal.setMap(this._map);
-			GameObjectDb.add(aminal);
 
-			var crate:CrateObject = new CrateObject(16, 32, ResourceDb.gfx_Crate);
-			crate.setMap(this._map);
-			GameObjectDb.add(crate);
-			this.backLayer.add(crate);
-
+			FlxG.flash(0xFF000000, 1);
+		
 			
 			// FlxG.camera.follow(this._player);
 			

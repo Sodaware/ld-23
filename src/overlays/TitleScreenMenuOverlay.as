@@ -5,14 +5,16 @@ package overlays
 	import org.flixel.FlxGroup;
 	import org.flixel.FlxSprite;
 	import db.ResourceDb;
+	import org.flixel.FlxText;
 	import org.flixel.plugin.photonstorm.FlxButtonPlus;
+	import org.flixel.FlxG;
 	
 	/**
 	 * Main title menu
 	 */
 	public class TitleScreenMenuOverlay extends ScreenOverlay 
 	{
-		private var _title:FlxSprite;		
+		private var _title:FlxText;		
 		private var _startButton:FlxButtonPlus;
 		
 		public function TitleScreenMenuOverlay() 
@@ -20,8 +22,9 @@ package overlays
 			super();
 			
 			// Title
-			this._title = new FlxSprite(0, 16, ResourceDb.gfx_Title);
-			this._title.alpha = 0;
+			this._title = new FlxText(0, 2, FlxG.width, ".. ineptia ..");
+			this._title.alignment = "center";
+			this._title.size = 16;
 			this.add(this._title);
 			
 			this._startButton = new FlxButtonPlus(0, 100, this.Handle_onStartClick, null, "Start");

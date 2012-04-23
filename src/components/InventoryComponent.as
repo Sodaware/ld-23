@@ -22,7 +22,7 @@ package components
 			this._items = [];
 			
 			// Hook up to destroyed event
-			GameEventDispatcher.getInstance().addEventListener(GameEventDispatcher.EVENT_DAMAGE, this.Handle_onParentDamaged);
+			GameEventDispatcher.getInstance().addEventListener(GameEventDispatcher.EVENT_DAMAGE, this.Handle_onParentDamaged, false, 0, true);
 		}
 		
 		// TODO: Should probably change this to a non-game object (as 99% of inventory items don't need to be rendered)

@@ -16,7 +16,16 @@ package components
 		private var _maxHealth:int;
 		private var _name:String;
 		
-		
+		public function setHealth(health:int) : void
+		{
+			this._health = health;
+		}
+
+		public function setMaxHealth(health:int) : void
+		{
+			this._maxHealth = health;
+		}
+
 		public function ShootableComponent(maxHealth:int) 
 		{
 			this._maxHealth = maxHealth;

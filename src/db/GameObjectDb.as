@@ -1,5 +1,6 @@
 package db 
 {
+	import events.GameEventDispatcher;
 	import objects.GameObject;
 	import org.flixel.FlxGroup;
 	
@@ -27,6 +28,19 @@ package db
 			}
 			
 			return null;
+		}
+		
+		public static function clear() : void
+		{
+			GameObjectDb._objects = [];
+			
+			for each (var o:GameObject in GameObjectDb._entities) {
+				o.active = false;
+				GameObjectDb._entities.remove(o);
+			}
+			
+			GameObjectDb._entities.destroy();
+			GameObjectDb._entities = new FlxGroup();
 		}
 		
 		public static function add(obj:GameObject) : void

@@ -31,7 +31,7 @@ package objects
 			
 			this._brain = new EnemyComponent();
 			
-			this._body = new ShootableComponent(10);
+			this._body = new ShootableComponent(8);
 			this._body.setName("Evil Robot");
 			
 			this.addComponent(this._movement);
@@ -53,7 +53,7 @@ package objects
 			
 			// Listen for the "go" button being pressed (so the enemy can calculate moves)
 			// Would like to delegate this down to the component level (in the brain section)
-			GameEventDispatcher.getInstance().addEventListener(GameEventDispatcher.EVENT_GO_PRESSED, this.Handle_beforeTurnStart);
+			GameEventDispatcher.getInstance().addEventListener(GameEventDispatcher.EVENT_GO_PRESSED, this.Handle_beforeTurnStart, false, 0, true);
 			
 		}
 		

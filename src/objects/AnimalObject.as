@@ -21,9 +21,15 @@ package objects
 		protected var _body:ShootableComponent;
 		protected var _scannable:ScannableComponent;
 		
-		public function AnimalObject(xPos:int, yPos:int, args:Object)
+		public var name:String;
+		public var info:Object;
+		
+		public function AnimalObject(xPos:int, yPos:int, name:String)
 		{
 			super(xPos, yPos);
+			
+			this.name = name;
+			this.info = ContentDb.animalData[name];
 			
 			this._movement = new MoveableObjectComponent();
 			this._movement.setMaxSize(4);
@@ -31,14 +37,14 @@ package objects
 			this._brain = new BrainComponent();
 			
 			this._body = new ShootableComponent(10);
-			this._body.setName(args["name"]);
+			this._body.setName(this.info["name"]);
 			
 			this.addComponent(this._movement);
 			this.addComponent(this._brain);
 			this.addComponent(this._body);
-			this.addComponent(new ScannableComponent());
+			this.addComponent(new ScannableComponent(this.info["difficulty"]));
 			
-			this.loadGraphic(args["sprite"], true, false, 16, 16);
+			this.loadGraphic(this.info["sprite"], true, false, 16, 16);
 			this.addAnimation("stand_down", [0, 1], 2);
 			this.addAnimation("stand_right", [2, 3], 2);
 			this.addAnimation("stand_left", [4, 5], 2);

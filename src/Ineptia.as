@@ -18,8 +18,8 @@ package
 		public function Ineptia()
 		{
 			//super(270, 152, TitleScreenState, 2);
-			//super(160, 152, TitleScreenState, 2);
-			super(160, 152, PlayState, 2);
+			super(160, 152, TitleScreenState, 2);
+			//super(160, 152, PlayState, 2);
 		}
 
 	}

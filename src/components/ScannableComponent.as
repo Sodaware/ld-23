@@ -7,9 +7,16 @@ package components
 	public class ScannableComponent extends BaseComponent 
 	{
 		
-		public function ScannableComponent() 
+		private var _difficulty:int;
+		
+		public function ScannableComponent(difficulty:int) 
 		{
-			
+			this._difficulty = difficulty;
+		}
+		
+		public function getDifficulty() : int
+		{
+			return this._difficulty;
 		}
 		
 	}

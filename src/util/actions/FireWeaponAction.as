@@ -37,7 +37,9 @@ package util.actions
 			
 			var bullet:Bullet = new Bullet(this._entity.x + (this._entity.width / 2), this._entity.y + (this._entity.height / 2), ResourceDb.gfx_Bullet);
 			bullet.setParent(this._entity);
-			bullet.setStrength(5);
+			
+			// TODO: Tweak this so it is based on equipment, rather than same for all
+			bullet.setStrength((Math.random() * 3) + 4);
 			
 			// Calculate target position
 			var target:GameObject = GameObject(this.getArg("target"));

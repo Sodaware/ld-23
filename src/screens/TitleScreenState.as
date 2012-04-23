@@ -19,6 +19,7 @@ package screens
 		private var _versionText:FlxText;
 		private var _background:FlxSprite;
 		private var _stars:StarfieldFX;
+		private var _ship:FlxSprite;
 		
 		private var _titleOverlay:TitleScreenMenuOverlay;
 		private var _currentOverlay:ScreenOverlay;
@@ -26,7 +27,7 @@ package screens
 		/**
 		 * Create the title screen.
 		 */
-		override public function create():void
+		public function TitleScreenState() : void
 		{
 			if (FlxG.getPlugin(FlxSpecialFX) == null) {
 				FlxG.addPlugin(new FlxSpecialFX);
@@ -41,6 +42,10 @@ package screens
 			this._background = this._stars.create(0, 0, FlxG.width, FlxG.height, 50, 1, 16);
 			this.add(this._background);
 
+			this._ship = new FlxSprite(FlxG.width + 10, 64, ResourceDb.gfx_TitleShip);
+			this._ship.velocity.x = -4;
+			this.add(this._ship);
+			
 			this._currentOverlay = new TitleScreenMenuOverlay();
 			this._currentOverlay.onHideFinished = this.Handle_onStartClick;
 			this._currentOverlay.show();
@@ -55,14 +60,36 @@ package screens
 			
 		}
 		
+		public function setOverlay(overlay:Class) : void
+		{
+			
+			if (this._currentOverlay) {
+				this._currentOverlay.destroy();
+				this.remove(this._currentOverlay);
+			}
+			
+			switch (overlay) {
+				case ModeSelectScreenOverlay:
+					this._currentOverlay = new ModeSelectScreenOverlay();
+					this._currentOverlay.onHideFinished = Handle_onMissionSelectClick;
+					this.add(this._currentOverlay);
+					break;
+			}
+		}
+		
+		override public function update():void 
+		{
+			super.update();
+			
+			if (this._ship.x < -this._ship.width) {
+				this._ship.y += (Math.random() * 6) - 12;
+				this._ship.x = FlxG.width + (Math.random() * 12);
+			}
+		}
+		
 		public function Handle_onStartClick(args:Object) : void
 		{
-			this._currentOverlay.destroy();
-			this.remove(this._currentOverlay);
-			
-			this._currentOverlay = new ModeSelectScreenOverlay();
-			this._currentOverlay.onHideFinished = Handle_onMissionSelectClick;
-			this.add(this._currentOverlay);
+			this.setOverlay(ModeSelectScreenOverlay);
 		}
 		
 		public function Handle_onMissionSelectClick(args:Object) : void
@@ -70,22 +97,66 @@ package screens
 			this._currentOverlay.destroy();
 			this.remove(this._currentOverlay);
 			
-			this._currentOverlay = new MissionSelectScreenOverlay();
-			this.add(this._currentOverlay);
+			switch (args["button"]) {
+				
+				case "biome_select":
+					this._currentOverlay = new BiomeSelectScreenOverlay();
+					this._currentOverlay.onHideFinished = Handle_onBiomeSelectClick;
+					this.add(this._currentOverlay);
+					break;
+					
+				case "bestiary":
+					this._currentOverlay = new BestiaryScreenOverlay();
+					this._currentOverlay.onHideFinished = Handle_onBestiarySelectClick;
+					this.add(this._currentOverlay);
+					break;
+			}
 			
-			this._currentOverlay.onHideFinished = Handle_onBiomeSelectClick;
+			
+		}
+		
+		public function Handle_onBestiarySelectClick(args:Object) : void
+		{
+			this._currentOverlay.destroy();
+			this.remove(this._currentOverlay);
+			
+			if (args["button"] == 'back') {
+				this._currentOverlay = new ModeSelectScreenOverlay();
+				this._currentOverlay.onHideFinished = Handle_onMissionSelectClick;
+				this.add(this._currentOverlay);
+				return;
+			}
+			
+			this._currentOverlay = new AnimalInfoScreenOverlay(args["button"]);
+			this._currentOverlay.onHideFinished = Handle_onExitAnimalInfoClick;
+			this.add(this._currentOverlay);
 			
 		}
 		
 		public function Handle_onBiomeSelectClick(args:Object) : void
 		{
-			switch (args.id) {
-				case "zone_temperate":
-					trace("We're going to the TEMPERATE zone");
-					FlxG.switchState(new PlayState());
-					break;
+			if (args["button"] == 'back') {
+				this._currentOverlay.destroy();
+				this.remove(this._currentOverlay);
+				this._currentOverlay = new ModeSelectScreenOverlay();
+				this._currentOverlay.onHideFinished = Handle_onMissionSelectClick;
+				this.add(this._currentOverlay);
+				return;
 			}
-//			
+			
+			FlxG.fade(0xFF000000, 1, function() : void {
+				FlxG.switchState(new PlayState(args.id));	
+			});
+		}
+		
+		public function Handle_onExitAnimalInfoClick(args:Object) : void
+		{
+			this._currentOverlay.destroy();
+			this.remove(this._currentOverlay);
+			
+			this._currentOverlay = new BestiaryScreenOverlay();
+			this._currentOverlay.onHideFinished = Handle_onBestiarySelectClick;
+			this.add(this._currentOverlay);
 			
 		}
 		

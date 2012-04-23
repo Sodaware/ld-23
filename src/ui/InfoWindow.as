@@ -5,6 +5,7 @@ package ui
 	import org.flixel.FlxText;
 	import org.flixel.FlxSprite;
 	import org.flixel.plugin.photonstorm.FlxBar;
+	import util.ObjectUtil;
 	
 	import components.*;
 	
@@ -15,9 +16,9 @@ package ui
 	public class InfoWindow extends FlxGroup 
 	{
 		
-		private var _title:FlxText;
-		private var _hpLabel:FlxText;
-		private var _hp:FlxBar;
+		protected var _title:FlxText;
+		protected var _hpLabel:FlxText;
+		protected var _hp:FlxBar;
 		
 		public function InfoWindow(entity:GameObject, xPos:int, yPos:int, width:int, height:int) 
 		{
@@ -47,9 +48,7 @@ package ui
 			this.add(this._hpLabel);
 			this.add(this._hp);
 			
-			frameOuter.scrollFactor.x = frameOuter.scrollFactor.y = 0;
-			frameInner.scrollFactor.x = frameInner.scrollFactor.y = 0;
-			this._title.scrollFactor.x = this._title.scrollFactor.y = 0;
+			ObjectUtil.lock(frameOuter, frameInner, this._title, this._hp, this._hpLabel);
 		
 		}
 		

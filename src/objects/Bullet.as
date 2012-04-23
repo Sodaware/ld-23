@@ -42,6 +42,8 @@ package objects
 		{
 			super.update();
 			
+			// TODO: Kill after a set time
+			
 			for each (var obj:GameObject in GameObjectDb.getObjectsWithComponent(ShootableComponent)) {
 				if (obj == this._parent) continue;
 				

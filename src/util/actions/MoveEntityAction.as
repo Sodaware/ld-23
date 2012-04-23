@@ -48,6 +48,11 @@ package util.actions
 			var tileY:int 	= yPos / 16;
 			var tileId:int	= entity.getMap().getTile(tileX, tileY);
 			
+			if (xPos < 0 || xPos > entity.getMap().width) return false;
+			if (yPos < 0 || yPos > entity.getMap().height) return false;
+			
+			
+			
 			if (tileId >= 4) {
 				return false;
 			}

@@ -2,6 +2,8 @@ package components
 {
 	import events.GameEventDispatcher;
 	import events.TurnStartEvent;
+	import util.actions.MoveEntityForwardAction;
+	import util.EntityAction;
 	import util.EntityActionFactory;
 	import db.ContentDb;
 	
@@ -14,7 +16,7 @@ package components
 		
 		public function BrainComponent() 
 		{
-			GameEventDispatcher.getInstance().addEventListener(GameEventDispatcher.EVENT_GO_PRESSED, this.Handle_beforeTurnStart);
+			GameEventDispatcher.getInstance().addEventListener(GameEventDispatcher.EVENT_GO_PRESSED, this.Handle_beforeTurnStart, false, 0, true);
 		}
 		
 		private function Handle_beforeTurnStart(e:TurnStartEvent) : void
@@ -27,7 +29,22 @@ package components
 			
 			// Now to do it
 			for (var i:int = 0; i < e.playerQueueSize; i++) {
-				movement.addAction(EntityActionFactory.create(ContentDb.ACTION_TURN_RIGHT));
+				
+				// See where we can move
+				var action:Number = Math.random();
+				if (action < 0.2) {
+					movement.addAction(EntityActionFactory.createRandomTurn());
+				} else if (action < 0.3) {
+					var moveForward:EntityAction = EntityActionFactory.create(ContentDb.ACTION_MOVE_FORWARD);
+					if (moveForward.canPerform(this.getParent())) {
+						movement.addAction(moveForward);
+					} else {
+						movement.addAction(EntityActionFactory.create(ContentDb.ACTION_DO_NOTHING));
+					}
+				} else {
+					movement.addAction(EntityActionFactory.create(ContentDb.ACTION_DO_NOTHING));
+				}
+				
 			}
 			
 		}
